@@ -1,0 +1,14 @@
+# Gradle
+.gradle/
+build/
+
+# Forge
+logs/
+run/
+
+# Eclipse
+*.launch
+.classpath
+.project
+.settings/
+bin/
