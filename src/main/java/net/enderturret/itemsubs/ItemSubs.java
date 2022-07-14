@@ -7,6 +7,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.enderturret.itemsubs.init.ISBlocks;
 import net.enderturret.itemsubs.init.ISEntityTypes;
 import net.enderturret.itemsubs.init.ISItems;
+import net.enderturret.itemsubs.init.ISMenus;
 
 @Mod(ItemSubs.MOD_ID)
 public class ItemSubs {
@@ -19,6 +20,7 @@ public class ItemSubs {
 		ISEntityTypes.REGISTRY.register(modBus);
 		ISBlocks.REGISTRY.register(modBus);
 		ISItems.REGISTRY.register(modBus);
+		ISMenus.REGISTRY.register(modBus);
 
 		// Must be after all the register() calls, so that blocks have a chance to register.
 		ISItems.registerBlockItems();
