@@ -32,22 +32,31 @@ public class SubmarineItem extends Item {
 		final BlockPos pos = ctx.getClickedPos();
 		final Direction clickedFace = ctx.getClickedFace();
 
+		final double yOffset;
+		if (clickedFace == Direction.DOWN)
+			yOffset = -0.75;
+		else if (clickedFace == Direction.UP)
+			yOffset = 1.25;
+		else
+			yOffset = .25;
+
 		final Vec3 spawnPos = new Vec3(
-				ctx.getClickLocation().x + clickedFace.getStepX() * .5,
-				ctx.getClickLocation().y + (clickedFace == Direction.DOWN ? -0.75 : 0.25),
-				ctx.getClickLocation().z + clickedFace.getStepZ() * .5
+				ctx.getClickedPos().getX() + clickedFace.getStepX() * 1 + 0.5,
+				ctx.getClickedPos().getY() + yOffset,
+				ctx.getClickedPos().getZ() + clickedFace.getStepZ() * 1 + 0.5
 				);
 
 		final BlockState state = level.getBlockState(new BlockPos(spawnPos));
 
-		if (!state.getFluidState().is(FluidTags.WATER))
-			return InteractionResult.FAIL;
+		//if (!state.getFluidState().is(FluidTags.WATER))
+			//return InteractionResult.FAIL;
 
 		final ItemStack stack = ctx.getItemInHand();
 
 		if (!level.isClientSide) {
 			final SubmarineEntity sub = ISEntityTypes.SUBMARINE.get().create(level);
 			sub.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
+			sub.setYRot(ctx.getHorizontalDirection().toYRot());
 
 			sub.readItemData(stack);
 
