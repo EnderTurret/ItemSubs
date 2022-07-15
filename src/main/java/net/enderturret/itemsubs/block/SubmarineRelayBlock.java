@@ -1,7 +1,9 @@
 package net.enderturret.itemsubs.block;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
@@ -20,6 +22,12 @@ public class SubmarineRelayBlock extends WaterloggedHorizontalBlock {
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 		super.createBlockStateDefinition(builder);
 		builder.add(PRESENCE);
+	}
+
+	@Override
+	public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos currentPos, BlockPos neighborPos) {
+		return super.updateShape(state, direction, neighborState, level, currentPos, neighborPos)
+				.setValue(PRESENCE, SubmarinePresence.NOT_PRESENT);
 	}
 
 	@SuppressWarnings("deprecation")
