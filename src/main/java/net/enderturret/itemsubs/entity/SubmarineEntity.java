@@ -30,7 +30,9 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
@@ -122,12 +124,28 @@ public class SubmarineEntity extends Entity {
 
 		if (isMoving()) {
 			final Direction dir = getDirection();
+			final BlockPos oldPos = blockPosition();
 
 			final double speed = .5 / 20;
 
 			final Vec3 movement = new Vec3(dir.getStepX() * speed, 0, dir.getStepZ() * speed);
 
-			final BlockPos oldPos = blockPosition();
+			final BlockPos nextPos = new BlockPos(position()
+					.add(dir.getStepX() * getBbWidth() / 1.8, 0, dir.getStepZ() * getBbWidth() / 1.8)
+					.add(movement));
+			if (!oldPos.equals(nextPos)) {
+				final BlockState nextState = level.getBlockState(nextPos);
+
+				final VoxelShape coll = nextState.getCollisionShape(level, nextPos);
+
+				if (!coll.isEmpty()) {
+					final AABB bounds = coll.bounds();
+					final AABB checkBounds = getBoundingBox().move(-oldPos.getX(), -oldPos.getY(), -oldPos.getZ());
+
+					if (bounds.intersects(checkBounds))
+						return;
+				}
+			}
 
 			move(MoverType.SELF, movement);
 
