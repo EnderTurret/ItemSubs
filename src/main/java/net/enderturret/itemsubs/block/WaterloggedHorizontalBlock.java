@@ -29,7 +29,7 @@ public class WaterloggedHorizontalBlock extends HorizontalDirectionalBlock imple
 
 		return defaultBlockState()
 				.setValue(WATERLOGGED, fluid.getType() == Fluids.WATER)
-				.setValue(FACING, context.getHorizontalDirection().getOpposite());
+				.setValue(FACING, context.getHorizontalDirection());
 	}
 
 	@SuppressWarnings("deprecation")
