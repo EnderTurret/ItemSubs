@@ -39,9 +39,9 @@ import net.enderturret.itemsubs.menu.SubmarineMenu;
 
 public class SubmarineEntity extends Entity {
 
-	private static final EntityDataAccessor<Integer> HURT = SynchedEntityData.defineId(Boat.class, EntityDataSerializers.INT);
-	private static final EntityDataAccessor<Integer> HURTDIR = SynchedEntityData.defineId(Boat.class, EntityDataSerializers.INT);
-	private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(Boat.class, EntityDataSerializers.FLOAT);
+	private static final EntityDataAccessor<Integer> HURT = SynchedEntityData.defineId(SubmarineEntity.class, EntityDataSerializers.INT);
+	private static final EntityDataAccessor<Integer> HURTDIR = SynchedEntityData.defineId(SubmarineEntity.class, EntityDataSerializers.INT);
+	private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(SubmarineEntity.class, EntityDataSerializers.FLOAT);
 
 	private static final Component NAME = Component.translatable("entity.itemsubs.submarine");
 
