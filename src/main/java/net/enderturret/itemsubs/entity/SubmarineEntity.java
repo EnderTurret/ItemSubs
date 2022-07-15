@@ -12,6 +12,7 @@ import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleContainer;
@@ -42,7 +43,7 @@ public class SubmarineEntity extends Entity {
 	private static final EntityDataAccessor<Integer> HURTDIR = SynchedEntityData.defineId(Boat.class, EntityDataSerializers.INT);
 	private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(Boat.class, EntityDataSerializers.FLOAT);
 
-	private static final Component NAME = Component.translatable("");
+	private static final Component NAME = Component.translatable("entity.itemsubs.submarine");
 
 	private final SimpleContainer container = new SimpleContainer(9 * 2 + 2) {
 		@Override
@@ -70,9 +71,8 @@ public class SubmarineEntity extends Entity {
 		final InteractionResult result = super.interact(player, hand);
 		if (result.consumesAction()) return result;
 
-		player.openMenu(new SimpleMenuProvider(
-				(containerId, playerInventory, _player) -> new SubmarineMenu(containerId, playerInventory, this),
-				hasCustomName() ? getCustomName() : NAME));
+		if (player instanceof ServerPlayer serverPlayer)
+			SubmarineMenu.openMenu(serverPlayer, this, hasCustomName() ? getCustomName() : NAME);
 
 		if (!player.level.isClientSide) {
 			gameEvent(GameEvent.CONTAINER_OPEN, player);
