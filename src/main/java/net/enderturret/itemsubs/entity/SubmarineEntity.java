@@ -136,17 +136,8 @@ public class SubmarineEntity extends Entity {
 		if (!container.isEmpty())
 			subStack.getOrCreateTag().put("inventory", container.createTag());
 
-		if (hasCustomName()) {
-			final CompoundTag display;
-			if (subStack.getOrCreateTag().contains("display", Tag.TAG_COMPOUND))
-				display = subStack.getTag().getCompound("display");
-			else {
-				display = new CompoundTag();
-				subStack.getTag().put("display", display);
-			}
-
-			display.putString("Name", Component.Serializer.toJson(getCustomName()));
-		}
+		if (hasCustomName())
+			subStack.setHoverName(getCustomName());
 	}
 
 	protected void destroy(DamageSource source) {
@@ -209,15 +200,14 @@ public class SubmarineEntity extends Entity {
 		containerCap = LazyOptional.of(() -> new InvWrapper(container));
 	}
 
-	public void readItemData(CompoundTag tag) {
-		if (tag.contains("display", Tag.TAG_COMPOUND)) {
-			final CompoundTag display = tag.getCompound("display");
-			if (display.contains("Name", Tag.TAG_STRING))
-				setCustomName(Component.Serializer.fromJson(display.getString("Name")));
-		}
+	public void readItemData(ItemStack stack) {
+		if (!stack.hasTag()) return;
 
-		if (tag.contains("inventory", Tag.TAG_LIST))
-			container.fromTag(tag.getList("inventory", Tag.TAG_COMPOUND));
+		if (stack.hasCustomHoverName())
+			setCustomName(stack.getHoverName());
+
+		if (stack.getTag().contains("inventory", Tag.TAG_LIST))
+			container.fromTag(stack.getTag().getList("inventory", Tag.TAG_COMPOUND));
 	}
 
 	@Override
