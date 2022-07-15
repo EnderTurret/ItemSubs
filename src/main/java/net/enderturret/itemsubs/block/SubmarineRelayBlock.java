@@ -1,10 +1,8 @@
 package net.enderturret.itemsubs.block;
 
-import net.minecraft.world.level.block.Block;
+public class SubmarineRelayBlock extends WaterloggedHorizontalBlock {
 
-public class SubmarineRelayBlock extends Block {
-
-	public SubmarineRelayBlock(Block.Properties props) {
+	public SubmarineRelayBlock(Properties props) {
 		super(props);
 	}
 }
