@@ -67,6 +67,16 @@ public class SubmarineEntity extends Entity {
 	}
 
 	@Override
+	public boolean isPickable() {
+		return !isRemoved();
+	}
+
+	@Override
+	public boolean canBeCollidedWith() {
+		return true;
+	}
+
+	@Override
 	public InteractionResult interact(Player player, InteractionHand hand) {
 		final InteractionResult result = super.interact(player, hand);
 		if (result.consumesAction()) return result;
