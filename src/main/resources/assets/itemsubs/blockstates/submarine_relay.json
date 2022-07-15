@@ -1,0 +1,9 @@
+{
+  "forge_marker": 1,
+  "variants": {
+    "facing=north": { "model": "itemsubs:block/submarine_relay" },
+    "facing=east": { "model": "itemsubs:block/submarine_relay", "y": 90 },
+    "facing=south": { "model": "itemsubs:block/submarine_relay", "y": 180 },
+    "facing=west": { "model": "itemsubs:block/submarine_relay", "y": 270 }
+  }
+}
