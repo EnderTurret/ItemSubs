@@ -28,7 +28,7 @@ public class SubmarineRenderer extends EntityRenderer<SubmarineEntity> {
 	public void render(SubmarineEntity entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
 		super.render(entity, entityYaw, partialTick, poseStack, buffer, packedLight);
 
-		model.setupAnim(entity, 0, 0, 0, 0, 0);
+		model.setupAnim(entity, 0, 0, 0, entity.getYRot(), entity.getXRot());
 
 		final VertexConsumer consumer = buffer.getBuffer(RenderType.entityCutoutNoCull(getTextureLocation(entity)));
 

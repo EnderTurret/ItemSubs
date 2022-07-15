@@ -13,6 +13,7 @@ import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 
 import net.enderturret.itemsubs.ItemSubs;
 import net.enderturret.itemsubs.entity.SubmarineEntity;
@@ -105,7 +106,8 @@ public class SubmarineModel extends EntityModel<SubmarineEntity> {
 	@Override
 	public void setupAnim(SubmarineEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
 		root.resetPose();
-		root.loadPose(PartPose.offsetAndRotation(0, -3, 0, (float) Math.PI, (float) Math.PI, 0));
+		root.loadPose(PartPose.offsetAndRotation(0, -3, 0,
+				(float) Math.PI, (float) Math.PI + ((float)Math.PI / 180F) * -netHeadYaw, 0));
 	}
 
 	@Override
