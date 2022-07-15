@@ -16,5 +16,5 @@ public class ISEntityTypes {
 
 	public static final RegistryObject<EntityType<SubmarineEntity>> SUBMARINE =
 			REGISTRY.register("submarine", () -> EntityType.Builder.<SubmarineEntity>of(SubmarineEntity::new, MobCategory.MISC)
-					.sized(0.8F, 0.8F).clientTrackingRange(10).build("itemsubs:submarine"));
+					.sized(0.0625F * 14, 0.625F).clientTrackingRange(10).build("itemsubs:submarine"));
 }
