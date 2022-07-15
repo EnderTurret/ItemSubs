@@ -3,6 +3,7 @@ package net.enderturret.itemsubs.entity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -20,19 +21,23 @@ import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.phys.Vec3;
 
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
+import net.enderturret.itemsubs.block.SubmarineRelayBlock;
 import net.enderturret.itemsubs.init.ISEntityTypes;
 import net.enderturret.itemsubs.init.ISItems;
 import net.enderturret.itemsubs.menu.SubmarineMenu;
@@ -42,6 +47,7 @@ public class SubmarineEntity extends Entity {
 	private static final EntityDataAccessor<Integer> HURT = SynchedEntityData.defineId(SubmarineEntity.class, EntityDataSerializers.INT);
 	private static final EntityDataAccessor<Integer> HURTDIR = SynchedEntityData.defineId(SubmarineEntity.class, EntityDataSerializers.INT);
 	private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(SubmarineEntity.class, EntityDataSerializers.FLOAT);
+	private static final EntityDataAccessor<Boolean> MOVING = SynchedEntityData.defineId(SubmarineEntity.class, EntityDataSerializers.BOOLEAN);
 
 	private static final Component NAME = Component.translatable("entity.itemsubs.submarine");
 
@@ -81,13 +87,17 @@ public class SubmarineEntity extends Entity {
 		final InteractionResult result = super.interact(player, hand);
 		if (result.consumesAction()) return result;
 
-		if (player instanceof ServerPlayer serverPlayer)
-			SubmarineMenu.openMenu(serverPlayer, this, hasCustomName() ? getCustomName() : NAME);
+		if (!player.isCrouching()) {
+			if (player instanceof ServerPlayer serverPlayer)
+				SubmarineMenu.openMenu(serverPlayer, this, hasCustomName() ? getCustomName() : NAME);
 
-		if (!player.level.isClientSide) {
-			gameEvent(GameEvent.CONTAINER_OPEN, player);
-			PiglinAi.angerNearbyPiglins(player, true);
-			return InteractionResult.CONSUME;
+			if (!player.level.isClientSide) {
+				gameEvent(GameEvent.CONTAINER_OPEN, player);
+				PiglinAi.angerNearbyPiglins(player, true);
+				return InteractionResult.CONSUME;
+			}
+		} else if (!player.level.isClientSide) {
+			setMoving(!isMoving());
 		}
 
 		return InteractionResult.SUCCESS;
@@ -102,6 +112,41 @@ public class SubmarineEntity extends Entity {
 			setDamage(getDamage() - 1F);
 
 		super.tick();
+
+		handleMovement();
+	}
+
+	protected void handleMovement() {
+		setOldPosAndRot();
+
+		if (isMoving()) {
+			final Direction dir = getDirection();
+
+			final double speed = .5 / 20;
+
+			final Vec3 movement = new Vec3(dir.getStepX() * speed, 0, dir.getStepZ() * speed);
+
+			move(MoverType.SELF, movement);
+
+			if (!level.isClientSide) {
+				final Vec3 pos = position();
+				final BlockPos realPos = new BlockPos(pos);
+
+				final double xOffset = pos.x - realPos.getX();
+				final double zOffset = pos.z - realPos.getZ();
+
+				if (xOffset > .49 && xOffset < .51 && zOffset > .49 && zOffset < .51) {
+					final BlockState underState = level.getBlockState(realPos.below());
+
+					if (underState.getBlock() instanceof SubmarineRelayBlock) {
+						setYRot(underState.getValue(SubmarineRelayBlock.FACING).toYRot());
+
+						// Correct position so that the submarine doesn't start drifting off.
+						setPos(new Vec3(realPos.getX() + .5, pos.y, realPos.getZ() + .5));
+					}
+				}
+			}
+		}
 	}
 
 	@Override
@@ -163,6 +208,7 @@ public class SubmarineEntity extends Entity {
 		entityData.define(HURT, 0);
 		entityData.define(HURTDIR, 1);
 		entityData.define(DAMAGE, 0F);
+		entityData.define(MOVING, false);
 	}
 
 	public void setDamage(float damageTaken) {
@@ -187,6 +233,14 @@ public class SubmarineEntity extends Entity {
 
 	public int getHurtDir() {
 		return entityData.get(HURTDIR);
+	}
+
+	public void setMoving(boolean moving) {
+		entityData.set(MOVING, moving);
+	}
+
+	public boolean isMoving() {
+		return entityData.get(MOVING);
 	}
 
 	@Override
@@ -223,11 +277,13 @@ public class SubmarineEntity extends Entity {
 	@Override
 	protected void readAdditionalSaveData(CompoundTag tag) {
 		container.fromTag(tag.getList("inventory", Tag.TAG_COMPOUND));
+		setMoving(tag.getBoolean("moving"));
 	}
 
 	@Override
 	protected void addAdditionalSaveData(CompoundTag tag) {
 		tag.put("inventory", container.createTag());
+		tag.putBoolean("moving", isMoving());
 	}
 
 	@Override
