@@ -63,7 +63,7 @@ public class SubmarineMenu extends AbstractContainerMenu {
 		// Player inventory slots
 		for (int y = 0; y < 3; ++y)
 			for (int x = 0; x < 9; ++x)
-				addSlot(new Slot(playerInv, 9 + x + y * 9, 8 + x * 18, 122 + y * 18 - 18));
+				addSlot(new Slot(playerInv, 9 + x + y * 9, 8 + x * 18, 122 + y * 18));
 
 		// Player hotbar slots
 		for (int x = 0; x < 9; ++x)

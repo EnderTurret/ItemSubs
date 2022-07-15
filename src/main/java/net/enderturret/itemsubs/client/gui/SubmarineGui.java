@@ -19,12 +19,20 @@ public class SubmarineGui extends AbstractContainerScreen<SubmarineMenu> {
 		super(menu, playerInventory, title);
 		imageWidth = 176;
 		imageHeight = 204;
+		inventoryLabelY = imageHeight - 94;
 	}
 
 	@Override
 	protected void renderBg(PoseStack poseStack, float partialTick, int mouseX, int mouseY) {
 		RenderSystem.setShaderTexture(0, TEXTURE);
 
-		blit(poseStack, 0, 0, imageWidth, imageHeight, 256, 256);
+		blit(poseStack, leftPos, topPos, 0, 0, imageWidth, imageHeight, 256, 256);
+	}
+
+	@Override
+	public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+		renderBackground(poseStack);
+		super.render(poseStack, mouseX, mouseY, partialTick);
+		renderTooltip(poseStack, mouseX, mouseY);
 	}
 }
