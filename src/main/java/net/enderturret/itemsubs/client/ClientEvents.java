@@ -14,16 +14,15 @@ import net.enderturret.itemsubs.client.gui.SubmarineGui;
 import net.enderturret.itemsubs.init.ISEntityTypes;
 import net.enderturret.itemsubs.init.ISMenus;
 
-@EventBusSubscriber(modid = ItemSubs.MOD_ID, bus = EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class ClientEvents {
-
-	@SubscribeEvent
-	static void registerEntityRenderers(RegisterRenderers e) {
-		e.registerEntityRenderer(ISEntityTypes.SUBMARINE.get(), SubmarineRenderer::new);
-	}
 
 	@EventBusSubscriber(modid = ItemSubs.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 	static class Mod {
+
+		@SubscribeEvent
+		static void registerEntityRenderers(RegisterRenderers e) {
+			e.registerEntityRenderer(ISEntityTypes.SUBMARINE.get(), SubmarineRenderer::new);
+		}
 
 		@SubscribeEvent
 		static void clientSetup(FMLClientSetupEvent e) {
@@ -31,5 +30,10 @@ public class ClientEvents {
 				MenuScreens.register(ISMenus.SUBMARINE.get(), SubmarineGui::new);
 			});
 		}
+	}
+
+	@EventBusSubscriber(modid = ItemSubs.MOD_ID, bus = EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
+	static class Forge {
+		
 	}
 }

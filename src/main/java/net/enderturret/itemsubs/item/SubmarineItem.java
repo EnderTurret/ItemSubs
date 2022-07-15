@@ -30,7 +30,15 @@ public class SubmarineItem extends Item {
 	public InteractionResult useOn(UseOnContext ctx) {
 		final Level level = ctx.getLevel();
 		final BlockPos pos = ctx.getClickedPos();
-		final BlockState state = level.getBlockState(pos);
+		final Direction clickedFace = ctx.getClickedFace();
+
+		final Vec3 spawnPos = new Vec3(
+				ctx.getClickLocation().x + clickedFace.getStepX() * .5,
+				ctx.getClickLocation().y + (clickedFace == Direction.DOWN ? -0.75 : 0.25),
+				ctx.getClickLocation().z + clickedFace.getStepZ() * .5
+				);
+
+		final BlockState state = level.getBlockState(new BlockPos(spawnPos));
 
 		if (!state.getFluidState().is(FluidTags.WATER))
 			return InteractionResult.FAIL;
@@ -38,14 +46,6 @@ public class SubmarineItem extends Item {
 		final ItemStack stack = ctx.getItemInHand();
 
 		if (!level.isClientSide) {
-			final Direction clickedFace = ctx.getClickedFace();
-
-			final Vec3 spawnPos = new Vec3(
-					ctx.getClickLocation().x + clickedFace.getStepX() * .5,
-					ctx.getClickLocation().y + (clickedFace == Direction.DOWN ? -0.75 : 0.25),
-					ctx.getClickLocation().z + clickedFace.getStepZ() * .5
-					);
-
 			final SubmarineEntity sub = ISEntityTypes.SUBMARINE.get().create(level);
 			sub.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
 
