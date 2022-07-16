@@ -30,6 +30,8 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -136,6 +138,8 @@ public class SubmarineEntity extends Entity {
 			if (!oldPos.equals(nextPos)) {
 				final BlockState nextState = level.getBlockState(nextPos);
 
+				// Check if the submarine is about to collide with another block.
+
 				final VoxelShape coll = nextState.getCollisionShape(level, nextPos);
 
 				if (!coll.isEmpty()) {
@@ -145,6 +149,23 @@ public class SubmarineEntity extends Entity {
 					if (bounds.intersects(checkBounds))
 						return;
 				}
+
+				// Check if the submarine is about to leave or enter water.
+				// This tries to avoid breaking immersion by having a submarine just yeet out of (or into) the ocean.
+				// This should not affect already-levitating submarines.
+
+				final FluidState currentFluid = level.getFluidState(oldPos);
+				// This should be perfectly safe, and more performant (theoretically).
+				// See LevelChunkSection#getFluidState(int, int, int).
+				final FluidState nextFluid = nextState.getFluidState();
+
+				final Fluid currentType = currentFluid.getType();
+				final Fluid nextType = nextFluid.getType();
+
+				if (currentType != nextType // If both fluids mismatch...
+						&& (!currentType.isSame(nextType) // ... and both fluids are not the same kind...
+								|| currentFluid.isSource() && !nextFluid.isSource())) // or the current fluid is a source block and the next fluid is not,
+					return; // Don't move forward.
 			}
 
 			move(MoverType.SELF, movement);
