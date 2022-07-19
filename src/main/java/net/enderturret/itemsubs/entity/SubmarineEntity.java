@@ -34,6 +34,7 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
@@ -76,6 +77,11 @@ public class SubmarineEntity extends Entity {
 
 	public SimpleContainer getContainer() {
 		return container;
+	}
+
+	@Override
+	public ItemStack getPickedResult(HitResult target) {
+		return new ItemStack(ISItems.SUBMARINE.get());
 	}
 
 	@Override
