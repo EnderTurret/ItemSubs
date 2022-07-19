@@ -1,7 +1,7 @@
 package net.enderturret.itemsubs.entity;
 
-import static net.enderturret.itemsubs.block.SubmarineRelayBlock.PRESENCE;
 import static net.enderturret.itemsubs.block.SubmarinePresence.*;
+import static net.enderturret.itemsubs.block.SubmarineRelayBlock.PRESENCE;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,14 +20,12 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleContainer;
-import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;

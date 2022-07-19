@@ -1,7 +1,5 @@
 package net.enderturret.itemsubs.menu;
 
-import org.jetbrains.annotations.Nullable;
-
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
