@@ -121,10 +121,49 @@ public class SubmarineEntity extends Entity {
 		handleMovement();
 	}
 
+	protected boolean canMove() {
+		return isMoving();
+	}
+
+	protected boolean checkCollision(BlockPos oldPos, BlockPos nextPos) {
+		final BlockState nextState = level.getBlockState(nextPos);
+
+		// Check if the submarine is about to collide with another block.
+
+		final VoxelShape coll = nextState.getCollisionShape(level, nextPos);
+
+		if (!coll.isEmpty()) {
+			final AABB bounds = coll.bounds();
+			final AABB checkBounds = getBoundingBox().move(-oldPos.getX(), -oldPos.getY(), -oldPos.getZ());
+
+			if (bounds.intersects(checkBounds))
+				return false;
+		}
+
+		// Check if the submarine is about to leave or enter water.
+		// This tries to avoid breaking immersion by having a submarine just yeet out of (or into) the ocean.
+		// This should not affect already-levitating submarines.
+
+		final FluidState currentFluid = level.getFluidState(oldPos);
+		// This should be perfectly safe, and more performant (theoretically).
+		// See LevelChunkSection#getFluidState(int, int, int).
+		final FluidState nextFluid = nextState.getFluidState();
+
+		final Fluid currentType = currentFluid.getType();
+		final Fluid nextType = nextFluid.getType();
+
+		if (currentType != nextType // If both fluids mismatch...
+				&& (!currentType.isSame(nextType) // ... and both fluids are not the same kind...
+						|| currentFluid.isSource() && !nextFluid.isSource())) // or the current fluid is a source block and the next fluid is not,
+			return false; // Don't move forward.
+
+		return true;
+	}
+
 	protected void handleMovement() {
 		setOldPosAndRot();
 
-		if (isMoving()) {
+		if (canMove()) {
 			final Direction dir = getDirection();
 			final BlockPos oldPos = blockPosition();
 
@@ -135,38 +174,9 @@ public class SubmarineEntity extends Entity {
 			final BlockPos nextPos = new BlockPos(position()
 					.add(dir.getStepX() * getBbWidth() / 1.8, 0, dir.getStepZ() * getBbWidth() / 1.8)
 					.add(movement));
-			if (!oldPos.equals(nextPos)) {
-				final BlockState nextState = level.getBlockState(nextPos);
 
-				// Check if the submarine is about to collide with another block.
-
-				final VoxelShape coll = nextState.getCollisionShape(level, nextPos);
-
-				if (!coll.isEmpty()) {
-					final AABB bounds = coll.bounds();
-					final AABB checkBounds = getBoundingBox().move(-oldPos.getX(), -oldPos.getY(), -oldPos.getZ());
-
-					if (bounds.intersects(checkBounds))
-						return;
-				}
-
-				// Check if the submarine is about to leave or enter water.
-				// This tries to avoid breaking immersion by having a submarine just yeet out of (or into) the ocean.
-				// This should not affect already-levitating submarines.
-
-				final FluidState currentFluid = level.getFluidState(oldPos);
-				// This should be perfectly safe, and more performant (theoretically).
-				// See LevelChunkSection#getFluidState(int, int, int).
-				final FluidState nextFluid = nextState.getFluidState();
-
-				final Fluid currentType = currentFluid.getType();
-				final Fluid nextType = nextFluid.getType();
-
-				if (currentType != nextType // If both fluids mismatch...
-						&& (!currentType.isSame(nextType) // ... and both fluids are not the same kind...
-								|| currentFluid.isSource() && !nextFluid.isSource())) // or the current fluid is a source block and the next fluid is not,
-					return; // Don't move forward.
-			}
+			if (!oldPos.equals(nextPos) && !checkCollision(oldPos, nextPos))
+				return;
 
 			move(MoverType.SELF, movement);
 
