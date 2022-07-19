@@ -2,28 +2,43 @@ package net.enderturret.itemsubs.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 
-public class SubmarineRelayBlock extends WaterloggedHorizontalBlock {
+public class SubmarineRelayBlock extends HorizontalDirectionalBlock {
 
 	public static final EnumProperty<SubmarinePresence> PRESENCE = EnumProperty.create("presence", SubmarinePresence.class);
+	public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
 	public SubmarineRelayBlock(Properties props) {
 		super(props);
-		registerDefaultState(defaultBlockState().setValue(PRESENCE, SubmarinePresence.NOT_PRESENT));
+		registerDefaultState(defaultBlockState()
+				.setValue(FACING, Direction.NORTH)
+				.setValue(PRESENCE, SubmarinePresence.NOT_PRESENT)
+				.setValue(POWERED, false));
 	}
 
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 		super.createBlockStateDefinition(builder);
-		builder.add(PRESENCE);
+		builder.add(FACING, PRESENCE, POWERED);
 	}
 
+	@Override
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
+		return defaultBlockState()
+				.setValue(FACING, context.getHorizontalDirection());
+	}
+
+	@SuppressWarnings("deprecation")
 	@Override
 	public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos currentPos, BlockPos neighborPos) {
 		return super.updateShape(state, direction, neighborState, level, currentPos, neighborPos)
