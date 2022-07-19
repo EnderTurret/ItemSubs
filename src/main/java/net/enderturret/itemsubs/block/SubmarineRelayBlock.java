@@ -41,7 +41,8 @@ public class SubmarineRelayBlock extends HorizontalDirectionalBlock {
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context) {
 		return defaultBlockState()
-				.setValue(FACING, context.getHorizontalDirection());
+				.setValue(FACING, context.getHorizontalDirection())
+				.setValue(POWERED, context.getLevel().hasNeighborSignal(context.getClickedPos()));
 	}
 
 	@SuppressWarnings("deprecation")
@@ -49,6 +50,13 @@ public class SubmarineRelayBlock extends HorizontalDirectionalBlock {
 	public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos currentPos, BlockPos neighborPos) {
 		return super.updateShape(state, direction, neighborState, level, currentPos, neighborPos)
 				.setValue(PRESENCE, SubmarinePresence.NOT_PRESENT);
+	}
+
+	@SuppressWarnings("deprecation")
+	@Override
+	public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+		if (state.getValue(POWERED) != level.hasNeighborSignal(pos))
+			level.setBlock(pos, state.cycle(POWERED), UPDATE_CLIENTS);
 	}
 
 	@SuppressWarnings("deprecation")
