@@ -1,5 +1,8 @@
 package net.enderturret.itemsubs.entity;
 
+import static net.enderturret.itemsubs.block.SubmarineRelayBlock.PRESENCE;
+import static net.enderturret.itemsubs.block.SubmarinePresence.*;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -187,10 +190,10 @@ public class SubmarineEntity extends Entity {
 				final BlockState underState = level.getBlockState(underPos);
 
 				if (underState.getBlock() instanceof SubmarineRelayBlock relay) {
-					final SubmarinePresence presence = underState.getValue(SubmarineRelayBlock.PRESENCE);
+					final SubmarinePresence presence = underState.getValue(PRESENCE);
 
-					if (presence == SubmarinePresence.NOT_PRESENT)
-						level.setBlock(underPos, underState.setValue(SubmarineRelayBlock.PRESENCE, SubmarinePresence.PRESENT), 3);
+					if (presence == NOT_PRESENT)
+						level.setBlock(underPos, underState.setValue(PRESENCE, PRESENT), 3);
 
 					final double xOffset = pos.x - underPos.getX();
 					final double zOffset = pos.z - underPos.getZ();
@@ -203,12 +206,12 @@ public class SubmarineEntity extends Entity {
 						setPos(new Vec3(underPos.getX() + .5, pos.y, underPos.getZ() + .5));
 
 						// Notify comparators and other fun things.
-						level.setBlock(underPos, underState.setValue(SubmarineRelayBlock.PRESENCE, SubmarinePresence.TURNING), 3);
+						level.setBlock(underPos, underState.setValue(PRESENCE, TURNING), 3);
 					}
 				} else if (!oldPos.equals(realPos)) {
 					final BlockState pastUnderState = level.getBlockState(oldPos.below());
-					if (pastUnderState.getBlock() instanceof SubmarineRelayBlock && pastUnderState.getValue(SubmarineRelayBlock.PRESENCE) != SubmarinePresence.NOT_PRESENT)
-						level.setBlock(oldPos.below(), pastUnderState.setValue(SubmarineRelayBlock.PRESENCE, SubmarinePresence.NOT_PRESENT), 3);
+					if (pastUnderState.getBlock() instanceof SubmarineRelayBlock && pastUnderState.getValue(PRESENCE) != NOT_PRESENT)
+						level.setBlock(oldPos.below(), pastUnderState.setValue(PRESENCE, NOT_PRESENT), 3);
 				}
 			}
 		}
