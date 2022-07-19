@@ -173,26 +173,27 @@ public class SubmarineEntity extends Entity {
 			if (!level.isClientSide) {
 				final Vec3 pos = position();
 				final BlockPos realPos = blockPosition();
-				final BlockState underState = level.getBlockState(realPos.below());
+				final BlockPos underPos = realPos.below();
+				final BlockState underState = level.getBlockState(underPos);
 
-				if (underState.getBlock() instanceof SubmarineRelayBlock) {
+				if (underState.getBlock() instanceof SubmarineRelayBlock relay) {
 					final SubmarinePresence presence = underState.getValue(SubmarineRelayBlock.PRESENCE);
 
 					if (presence == SubmarinePresence.NOT_PRESENT)
-						level.setBlock(realPos.below(), underState.setValue(SubmarineRelayBlock.PRESENCE, SubmarinePresence.PRESENT), 3);
+						level.setBlock(underPos, underState.setValue(SubmarineRelayBlock.PRESENCE, SubmarinePresence.PRESENT), 3);
 
-					final double xOffset = pos.x - realPos.getX();
-					final double zOffset = pos.z - realPos.getZ();
+					final double xOffset = pos.x - underPos.getX();
+					final double zOffset = pos.z - underPos.getZ();
 
 					if (xOffset > .49 && xOffset < .51 && zOffset > .49 && zOffset < .51) {
 						// Turn in the direction of the relay.
-						setYRot(underState.getValue(SubmarineRelayBlock.FACING).toYRot());
+						setYRot(relay.getOrientation(underState, level, underPos).toYRot());
 
 						// Correct position so that the submarine doesn't start drifting off.
-						setPos(new Vec3(realPos.getX() + .5, pos.y, realPos.getZ() + .5));
+						setPos(new Vec3(underPos.getX() + .5, pos.y, underPos.getZ() + .5));
 
 						// Notify comparators and other fun things.
-						level.setBlock(realPos.below(), underState.setValue(SubmarineRelayBlock.PRESENCE, SubmarinePresence.TURNING), 3);
+						level.setBlock(underPos, underState.setValue(SubmarineRelayBlock.PRESENCE, SubmarinePresence.TURNING), 3);
 					}
 				} else if (!oldPos.equals(realPos)) {
 					final BlockState pastUnderState = level.getBlockState(oldPos.below());

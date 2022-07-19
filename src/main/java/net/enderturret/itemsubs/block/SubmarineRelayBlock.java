@@ -26,6 +26,12 @@ public class SubmarineRelayBlock extends HorizontalDirectionalBlock {
 				.setValue(POWERED, false));
 	}
 
+	public Direction getOrientation(BlockState state, Level level, BlockPos pos) {
+		// Remember when we called this EnumFacing?
+		final Direction facing = state.getValue(FACING);
+		return state.getValue(POWERED) ? facing.getOpposite() : facing;
+	}
+
 	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
 		super.createBlockStateDefinition(builder);

@@ -1,9 +1,14 @@
 {
   "forge_marker": 1,
   "variants": {
-    "facing=north": { "model": "itemsubs:block/submarine_relay" },
-    "facing=east": { "model": "itemsubs:block/submarine_relay", "y": 90 },
-    "facing=south": { "model": "itemsubs:block/submarine_relay", "y": 180 },
-    "facing=west": { "model": "itemsubs:block/submarine_relay", "y": 270 }
+    "facing=north,powered=false": { "model": "itemsubs:block/submarine_relay" },
+    "facing=east,powered=false": { "model": "itemsubs:block/submarine_relay", "y": 90 },
+    "facing=south,powered=false": { "model": "itemsubs:block/submarine_relay", "y": 180 },
+    "facing=west,powered=false": { "model": "itemsubs:block/submarine_relay", "y": 270 },
+
+    "facing=north,powered=true": { "model": "itemsubs:block/submarine_relay", "y": 180 },
+    "facing=east,powered=true": { "model": "itemsubs:block/submarine_relay", "y": 270 },
+    "facing=south,powered=true": { "model": "itemsubs:block/submarine_relay" },
+    "facing=west,powered=true": { "model": "itemsubs:block/submarine_relay", "y": 90 }
   }
 }
