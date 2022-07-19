@@ -3,7 +3,8 @@
 	"textures": {
 		"1": "block/smooth_stone",
 		"3": "block/polished_deepslate",
-		"4": "block/polished_andesite"
+		"4": "block/polished_andesite",
+		"particle": "block/smooth_stone"
 	},
 	"elements": [
 		{
