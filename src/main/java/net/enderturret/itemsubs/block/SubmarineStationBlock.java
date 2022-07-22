@@ -8,6 +8,8 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -15,9 +17,10 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import net.enderturret.itemsubs.block.entity.SubmarineStationBlockEntity;
 import net.enderturret.itemsubs.entity.SubmarineEntity;
 
-public class SubmarineStationBlock extends WaterloggedHorizontalBlock implements ISubmarineBlock {
+public class SubmarineStationBlock extends WaterloggedHorizontalBlock implements ISubmarineBlock, EntityBlock {
 
 	public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
@@ -50,6 +53,11 @@ public class SubmarineStationBlock extends WaterloggedHorizontalBlock implements
 	public void onSubmarineDocked(BlockState state, Level level, BlockPos pos, SubmarineEntity entity, boolean over) {
 		if (!over)
 			entity.setMoving(state.getValue(POWERED));
+	}
+
+	@Override
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+		return new SubmarineStationBlockEntity(pos, state);
 	}
 
 	@Override

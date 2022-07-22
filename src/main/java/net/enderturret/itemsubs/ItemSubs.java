@@ -4,6 +4,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
+import net.enderturret.itemsubs.init.ISBlockEntityTypes;
 import net.enderturret.itemsubs.init.ISBlocks;
 import net.enderturret.itemsubs.init.ISEntityTypes;
 import net.enderturret.itemsubs.init.ISItems;
@@ -17,8 +18,9 @@ public class ItemSubs {
 	public ItemSubs() {
 		final IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
 
-		ISEntityTypes.REGISTRY.register(modBus);
+		ISBlockEntityTypes.REGISTRY.register(modBus);
 		ISBlocks.REGISTRY.register(modBus);
+		ISEntityTypes.REGISTRY.register(modBus);
 		ISItems.REGISTRY.register(modBus);
 		ISMenus.REGISTRY.register(modBus);
 
