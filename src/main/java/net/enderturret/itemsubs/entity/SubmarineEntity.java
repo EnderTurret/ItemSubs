@@ -133,20 +133,9 @@ public class SubmarineEntity extends Entity {
 		return isMoving();
 	}
 
-	protected boolean checkCollision(BlockPos oldPos, BlockPos nextPos) {
+	protected boolean checkCollision(BlockPos oldPos, BlockPos nextPos, Direction towards) {
 		final BlockState nextState = level.getBlockState(nextPos);
-
-		// Check if the submarine is about to collide with another block.
-
-		final VoxelShape coll = nextState.getCollisionShape(level, nextPos);
-
-		if (!coll.isEmpty()) {
-			final AABB bounds = coll.bounds();
-			final AABB checkBounds = getBoundingBox().move(-oldPos.getX(), -oldPos.getY(), -oldPos.getZ());
-
-			if (bounds.intersects(checkBounds))
-				return false;
-		}
+		final ISubmarineBlock block = nextState.getBlock() instanceof ISubmarineBlock b ? b : null;
 
 		// Check if the submarine is about to leave or enter water.
 		// This tries to avoid breaking immersion by having a submarine just yeet out of (or into) the ocean.
@@ -164,6 +153,30 @@ public class SubmarineEntity extends Entity {
 				&& (!currentType.isSame(nextType) // ... and both fluids are not the same kind...
 						|| currentFluid.isSource() && !nextFluid.isSource())) // or the current fluid is a source block and the next fluid is not,
 			return false; // Don't move forward.
+
+		// Check if the submarine is about to collide with another block.
+
+		if (block != null) {
+			// Check if the block allows or denies entry regardless of shape.
+			final Boolean canEnter = block.canSubmarineEnter(nextState, level, nextPos, towards, this);
+			if (canEnter != null)
+				return canEnter;
+		}
+
+		final VoxelShape coll;
+
+		if (block != null)
+			coll = block.getSubmarineCollisionShape(nextState, level, nextPos, this);
+		else
+			coll = nextState.getCollisionShape(level, nextPos);
+
+		if (!coll.isEmpty()) {
+			final AABB bounds = coll.bounds();
+			final AABB checkBounds = getBoundingBox().move(-oldPos.getX(), -oldPos.getY(), -oldPos.getZ());
+
+			if (bounds.intersects(checkBounds))
+				return false;
+		}
 
 		return true;
 	}
@@ -183,7 +196,7 @@ public class SubmarineEntity extends Entity {
 					.add(dir.getStepX() * getBbWidth() / 1.8, 0, dir.getStepZ() * getBbWidth() / 1.8)
 					.add(movement));
 
-			if (!oldPos.equals(nextPos) && !checkCollision(oldPos, nextPos))
+			if (!oldPos.equals(nextPos) && !checkCollision(oldPos, nextPos, dir))
 				return;
 
 			move(MoverType.SELF, movement);

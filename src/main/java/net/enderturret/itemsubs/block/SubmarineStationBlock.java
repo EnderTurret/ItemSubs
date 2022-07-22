@@ -40,6 +40,13 @@ public class SubmarineStationBlock extends WaterloggedHorizontalBlock implements
 	}
 
 	@Override
+	@Nullable
+	public Boolean canSubmarineEnter(BlockState state, Level level, BlockPos pos, Direction enterDirection, SubmarineEntity entity) {
+		// Allow the submarine to enter from the front.
+		return state.getValue(FACING) == enterDirection.getOpposite() ? true : null;
+	}
+
+	@Override
 	public void onSubmarineDocked(BlockState state, Level level, BlockPos pos, SubmarineEntity entity, boolean over) {
 		if (!over)
 			entity.setMoving(state.getValue(POWERED));

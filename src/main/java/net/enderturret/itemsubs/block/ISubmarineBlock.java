@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import net.enderturret.itemsubs.entity.SubmarineEntity;
 
@@ -24,6 +25,36 @@ public interface ISubmarineBlock {
 	 */
 	@Nullable
 	public Direction getOrientation(BlockState state, Level level, BlockPos pos, @Nullable SubmarineEntity entity, boolean over);
+
+	/**
+	 * Called by submarines to determine the collision shape of this block.
+	 * This can be used to customize the shape that is checked.
+	 * Be careful, as this could cause submarines to clip through the block.
+	 * @param state The {@link BlockState} at {@code pos}.
+	 * @param level The world the block is in.
+	 * @param pos The location of the block in the world.
+	 * @param entity The submarine that is acquiring the shape. May be {@code null}.
+	 * @return The collision shape.
+	 */
+	public default VoxelShape getSubmarineCollisionShape(BlockState state, Level level, BlockPos pos, @Nullable SubmarineEntity entity) {
+		return state.getCollisionShape(level, pos);
+	}
+
+	/**
+	 * Called by submarines to determine if they may enter this block.
+	 * This can be used to allow or deny entry even if the collision shape disagrees.
+	 * Returning {@code null} will cause the submarine to check the {@linkplain #getSubmarineCollisionShape(BlockState, Level, BlockPos, SubmarineEntity) collision shape} instead.
+	 * @param state The {@link BlockState} at {@code pos}.
+	 * @param level The world the block is in.
+	 * @param pos The location of the block in the world.
+	 * @param enterDirection The direction the submarine is entering from.
+	 * @param entity The submarine that is attempting to enter.
+	 * @return Whether the submarine may enter from the given side, or {@code null} to check the collision shape.
+	 */
+	@Nullable
+	public default Boolean canSubmarineEnter(BlockState state, Level level, BlockPos pos, Direction enterDirection, SubmarineEntity entity) {
+		return null;
+	}
 
 	/**
 	 * Called when a submarine is moving over or inside this block.
