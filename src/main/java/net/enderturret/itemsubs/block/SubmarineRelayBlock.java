@@ -1,5 +1,9 @@
 package net.enderturret.itemsubs.block;
 
+import static net.enderturret.itemsubs.block.SubmarinePresence.*;
+
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -13,7 +17,9 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 
-public class SubmarineRelayBlock extends HorizontalDirectionalBlock {
+import net.enderturret.itemsubs.entity.SubmarineEntity;
+
+public class SubmarineRelayBlock extends HorizontalDirectionalBlock implements ISubmarineBlock {
 
 	public static final EnumProperty<SubmarinePresence> PRESENCE = EnumProperty.create("presence", SubmarinePresence.class);
 	public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
@@ -22,14 +28,32 @@ public class SubmarineRelayBlock extends HorizontalDirectionalBlock {
 		super(props);
 		registerDefaultState(defaultBlockState()
 				.setValue(FACING, Direction.NORTH)
-				.setValue(PRESENCE, SubmarinePresence.NOT_PRESENT)
+				.setValue(PRESENCE, NOT_PRESENT)
 				.setValue(POWERED, false));
 	}
 
-	public Direction getOrientation(BlockState state, Level level, BlockPos pos) {
+	@Override
+	public Direction getOrientation(BlockState state, Level level, BlockPos pos, @Nullable SubmarineEntity submarine, boolean over) {
 		// Remember when we called this EnumFacing?
 		final Direction facing = state.getValue(FACING);
 		return state.getValue(POWERED) ? facing.getOpposite() : facing;
+	}
+
+	@Override
+	public void onSubmarineOver(BlockState state, Level level, BlockPos pos, SubmarineEntity entity, boolean over) {
+		if (state.getValue(PRESENCE) == NOT_PRESENT)
+			level.setBlock(pos, state.setValue(PRESENCE, PRESENT), 3);
+	}
+
+	@Override
+	public void onSubmarineDocked(BlockState state, Level level, BlockPos pos, SubmarineEntity entity, boolean over) {
+		level.setBlock(pos, state.setValue(PRESENCE, TURNING), 3);
+	}
+
+	@Override
+	public void onSubmarineLeaving(BlockState state, Level level, BlockPos pos, SubmarineEntity entity, boolean over) {
+		if (state.getValue(PRESENCE) != NOT_PRESENT)
+			level.setBlock(pos, state.setValue(PRESENCE, NOT_PRESENT), 3);
 	}
 
 	@Override
@@ -49,7 +73,7 @@ public class SubmarineRelayBlock extends HorizontalDirectionalBlock {
 	@Override
 	public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos currentPos, BlockPos neighborPos) {
 		return super.updateShape(state, direction, neighborState, level, currentPos, neighborPos)
-				.setValue(PRESENCE, SubmarinePresence.NOT_PRESENT);
+				.setValue(PRESENCE, NOT_PRESENT);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -62,7 +86,7 @@ public class SubmarineRelayBlock extends HorizontalDirectionalBlock {
 	@SuppressWarnings("deprecation")
 	@Override
 	public boolean hasAnalogOutputSignal(BlockState state) {
-		return state.getValue(PRESENCE) != SubmarinePresence.NOT_PRESENT;
+		return state.getValue(PRESENCE) != NOT_PRESENT;
 	}
 
 	@SuppressWarnings("deprecation")

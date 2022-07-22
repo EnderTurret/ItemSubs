@@ -43,6 +43,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
+import net.enderturret.itemsubs.block.ISubmarineBlock;
 import net.enderturret.itemsubs.block.SubmarinePresence;
 import net.enderturret.itemsubs.block.SubmarineRelayBlock;
 import net.enderturret.itemsubs.init.ISEntityTypes;
@@ -190,32 +191,42 @@ public class SubmarineEntity extends Entity {
 			if (!level.isClientSide) {
 				final Vec3 pos = position();
 				final BlockPos realPos = blockPosition();
-				final BlockPos underPos = realPos.below();
-				final BlockState underState = level.getBlockState(underPos);
 
-				if (underState.getBlock() instanceof SubmarineRelayBlock relay) {
-					final SubmarinePresence presence = underState.getValue(PRESENCE);
+				// Use a simple loop here to check at current position as well as below us.
+				for (int yOffset = 0; yOffset == 0 || yOffset == 1; yOffset++) {
+					final BlockPos offPos = realPos.below(yOffset);
+					final BlockState offState = level.getBlockState(offPos);
 
-					if (presence == NOT_PRESENT)
-						level.setBlock(underPos, underState.setValue(PRESENCE, PRESENT), 3);
+					if (offState.getBlock() instanceof ISubmarineBlock block) {
+						block.onSubmarineOver(offState, level, offPos, this, yOffset == 1);
 
-					final double xOffset = pos.x - underPos.getX();
-					final double zOffset = pos.z - underPos.getZ();
+						final double xOffset = pos.x - offPos.getX();
+						final double zOffset = pos.z - offPos.getZ();
 
-					if (xOffset > .49 && xOffset < .51 && zOffset > .49 && zOffset < .51) {
-						// Turn in the direction of the relay.
-						setYRot(relay.getOrientation(underState, level, underPos).toYRot());
+						if (xOffset > .49 && xOffset < .51 && zOffset > .49 && zOffset < .51) {
+							// Turn in the direction of the block.
+							final Direction orientation = block.getOrientation(offState, level, offPos, this, yOffset == 1);
+							if (orientation != null)
+								setYRot(orientation.toYRot());
 
-						// Correct position so that the submarine doesn't start drifting off.
-						setPos(new Vec3(underPos.getX() + .5, pos.y, underPos.getZ() + .5));
+							// Correct position so that the submarine doesn't start drifting off.
+							setPos(new Vec3(offPos.getX() + .5, pos.y, offPos.getZ() + .5));
 
-						// Notify comparators and other fun things.
-						level.setBlock(underPos, underState.setValue(PRESENCE, TURNING), 3);
+							// Notify the block.
+							block.onSubmarineDocked(offState, level, offPos, this, yOffset == 1);
+						}
+
+						break;
 					}
-				} else if (!oldPos.equals(realPos)) {
-					final BlockState pastUnderState = level.getBlockState(oldPos.below());
-					if (pastUnderState.getBlock() instanceof SubmarineRelayBlock && pastUnderState.getValue(PRESENCE) != NOT_PRESENT)
-						level.setBlock(oldPos.below(), pastUnderState.setValue(PRESENCE, NOT_PRESENT), 3);
+
+					else if (!oldPos.equals(realPos)) {
+						final BlockPos pastPos = oldPos.below(yOffset);
+						final BlockState pastState = level.getBlockState(pastPos);
+						if (pastState.getBlock() instanceof ISubmarineBlock block) {
+							block.onSubmarineLeaving(pastState, level, pastPos, this, yOffset == 1);
+							break;
+						}
+					}
 				}
 			}
 		}

@@ -1,5 +1,7 @@
 package net.enderturret.itemsubs.block;
 
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -13,7 +15,9 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class SubmarineStationBlock extends WaterloggedHorizontalBlock {
+import net.enderturret.itemsubs.entity.SubmarineEntity;
+
+public class SubmarineStationBlock extends WaterloggedHorizontalBlock implements ISubmarineBlock {
 
 	public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
@@ -27,6 +31,18 @@ public class SubmarineStationBlock extends WaterloggedHorizontalBlock {
 	public SubmarineStationBlock(Properties props) {
 		super(props);
 		registerDefaultState(defaultBlockState().setValue(POWERED, false));
+	}
+
+	@Override
+	@Nullable
+	public Direction getOrientation(BlockState state, Level level, BlockPos pos, @Nullable SubmarineEntity entity, boolean over) {
+		return over ? null : state.getValue(FACING);
+	}
+
+	@Override
+	public void onSubmarineDocked(BlockState state, Level level, BlockPos pos, SubmarineEntity entity, boolean over) {
+		if (!over)
+			entity.setMoving(state.getValue(POWERED));
 	}
 
 	@Override
