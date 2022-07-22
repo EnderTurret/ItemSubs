@@ -51,8 +51,17 @@ public class SubmarineStationBlock extends WaterloggedHorizontalBlock implements
 
 	@Override
 	public void onSubmarineDocked(BlockState state, Level level, BlockPos pos, SubmarineEntity entity, boolean over) {
-		if (!over)
+		if (!over) {
 			entity.setMoving(state.getValue(POWERED));
+			final SubmarineStationBlockEntity ssbe = (SubmarineStationBlockEntity) level.getBlockEntity(pos);
+			ssbe.setDocked(entity);
+		}
+	}
+
+	@Override
+	public void onSubmarineLeaving(BlockState state, Level level, BlockPos pos, SubmarineEntity entity, boolean over) {
+		final SubmarineStationBlockEntity ssbe = (SubmarineStationBlockEntity) level.getBlockEntity(pos);
+		ssbe.setDocked(null);
 	}
 
 	@Override
