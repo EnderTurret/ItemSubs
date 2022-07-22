@@ -84,8 +84,15 @@ public class SubmarineStationBlock extends WaterloggedHorizontalBlock implements
 	@SuppressWarnings("deprecation")
 	@Override
 	public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
-		if (state.getValue(POWERED) != level.hasNeighborSignal(pos))
-			level.setBlock(pos, state.cycle(POWERED), UPDATE_CLIENTS);
+		if (state.getValue(POWERED) != level.hasNeighborSignal(pos)) {
+			final BlockState newState = state.cycle(POWERED);
+			level.setBlock(pos, newState, UPDATE_CLIENTS);
+			if (newState.getValue(POWERED)) {
+				final SubmarineStationBlockEntity ssbe = (SubmarineStationBlockEntity) level.getBlockEntity(pos);
+				if (ssbe.docked() != null)
+					ssbe.docked().setMoving(true);
+			}
+		}
 	}
 
 	@SuppressWarnings("deprecation")
