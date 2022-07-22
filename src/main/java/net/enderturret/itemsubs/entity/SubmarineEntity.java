@@ -19,6 +19,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleContainer;
@@ -52,6 +53,7 @@ import net.enderturret.itemsubs.block.SubmarineRelayBlock;
 import net.enderturret.itemsubs.init.ISEntityTypes;
 import net.enderturret.itemsubs.init.ISItems;
 import net.enderturret.itemsubs.menu.SubmarineMenu;
+import net.enderturret.itemsubs.util.ContainerHelper2;
 import net.enderturret.itemsubs.util.SlotLimitingContainer;
 
 public class SubmarineEntity extends Entity {
@@ -324,7 +326,7 @@ public class SubmarineEntity extends Entity {
 
 	protected void copyData(ItemStack subStack) {
 		if (!container.isEmpty())
-			subStack.getOrCreateTag().put("inventory", container.createTag());
+			ContainerHelper2.saveAllItems(subStack.getOrCreateTag(), container, false);
 
 		if (hasCustomName())
 			subStack.setHoverName(getCustomName());
@@ -394,12 +396,18 @@ public class SubmarineEntity extends Entity {
 		super.invalidateCaps();
 		containerCap.invalidate();
 		containerCap = null;
+		fuelCap.invalidate();
+		fuelCap = null;
+		storageOnlyCap.invalidate();
+		storageOnlyCap = null;
 	}
 
 	@Override
 	public void reviveCaps() {
 		super.reviveCaps();
 		containerCap = LazyOptional.of(() -> new InvWrapper(container));
+		fuelCap = LazyOptional.of(() -> new InvWrapper(fuel));
+		storageOnlyCap = LazyOptional.of(() -> new InvWrapper(storage));
 	}
 
 	public void readItemData(ItemStack stack) {
@@ -408,19 +416,19 @@ public class SubmarineEntity extends Entity {
 		if (stack.hasCustomHoverName())
 			setCustomName(stack.getHoverName());
 
-		if (stack.getTag().contains("inventory", Tag.TAG_LIST))
-			container.fromTag(stack.getTag().getList("inventory", Tag.TAG_COMPOUND));
+		if (stack.getTag().contains("Items", Tag.TAG_LIST))
+			ContainerHelper2.loadAllItems(stack.getTag(), container);
 	}
 
 	@Override
 	protected void readAdditionalSaveData(CompoundTag tag) {
-		container.fromTag(tag.getList("inventory", Tag.TAG_COMPOUND));
+		ContainerHelper2.loadAllItems(tag, container);
 		setMoving(tag.getBoolean("moving"));
 	}
 
 	@Override
 	protected void addAdditionalSaveData(CompoundTag tag) {
-		tag.put("inventory", container.createTag());
+		ContainerHelper2.saveAllItems(tag, container, true);
 		tag.putBoolean("moving", isMoving());
 	}
 
