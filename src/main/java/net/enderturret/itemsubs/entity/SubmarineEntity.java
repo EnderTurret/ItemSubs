@@ -3,6 +3,8 @@ package net.enderturret.itemsubs.entity;
 import static net.enderturret.itemsubs.block.SubmarinePresence.*;
 import static net.enderturret.itemsubs.block.SubmarineRelayBlock.PRESENCE;
 
+import java.util.List;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,12 +45,14 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
+import net.enderturret.itemsubs.SubmarineFuel;
 import net.enderturret.itemsubs.block.ISubmarineBlock;
 import net.enderturret.itemsubs.block.SubmarinePresence;
 import net.enderturret.itemsubs.block.SubmarineRelayBlock;
 import net.enderturret.itemsubs.init.ISEntityTypes;
 import net.enderturret.itemsubs.init.ISItems;
 import net.enderturret.itemsubs.menu.SubmarineMenu;
+import net.enderturret.itemsubs.util.SlotLimitingContainer;
 
 public class SubmarineEntity extends Entity {
 
@@ -64,9 +68,23 @@ public class SubmarineEntity extends Entity {
 		public boolean stillValid(Player player) {
 			return !isRemoved() && position().closerThan(player.position(), 8);
 		}
+		@Override
+		public boolean canPlaceItem(int index, ItemStack stack) {
+			if (index == 0)
+				return SubmarineFuel.isValidFuel(stack);
+			if (index == 1)
+				return false; // TODO: Upgrades
+			return true;
+		}
 	};
 
+	private final SlotLimitingContainer fuel = new SlotLimitingContainer(container, 0, 1);
+	private final SlotLimitingContainer storage = new SlotLimitingContainer(container, 2, container.getContainerSize() - 2);
+
 	private LazyOptional<?> containerCap = LazyOptional.of(() -> new InvWrapper(container));
+
+	private LazyOptional<?> fuelCap = LazyOptional.of(() -> new InvWrapper(fuel));
+	private LazyOptional<?> storageOnlyCap = LazyOptional.of(() -> new InvWrapper(storage));
 
 	public SubmarineEntity(EntityType<? extends SubmarineEntity> type, Level level) {
 		super(type, level);
@@ -133,10 +151,13 @@ public class SubmarineEntity extends Entity {
 		return isMoving();
 	}
 
-	protected boolean checkCollision(BlockPos oldPos, BlockPos nextPos, Direction towards) {
-		final BlockState nextState = level.getBlockState(nextPos);
-		final ISubmarineBlock block = nextState.getBlock() instanceof ISubmarineBlock b ? b : null;
+	protected boolean checkEntityCollision(BlockPos oldPos, BlockPos nextPos, Direction towards) {
+		final AABB bounds = getBoundingBox().move(towards.getStepX(), towards.getStepY(), towards.getStepZ());
+		final List<Entity> entities = level.getEntities(this, new AABB(nextPos), e -> e.isPickable() && e.getBoundingBox().intersects(bounds));
+		return entities.isEmpty();
+	}
 
+	protected boolean checkFluidCollision(BlockPos oldPos, BlockPos nextPos, Direction towards, BlockState nextState) {
 		// Check if the submarine is about to leave or enter water.
 		// This tries to avoid breaking immersion by having a submarine just yeet out of (or into) the ocean.
 		// This should not affect already-levitating submarines.
@@ -154,7 +175,13 @@ public class SubmarineEntity extends Entity {
 						|| currentFluid.isSource() && !nextFluid.isSource())) // or the current fluid is a source block and the next fluid is not,
 			return false; // Don't move forward.
 
+		return true;
+	}
+
+	protected boolean checkBlockCollision(BlockPos oldPos, BlockPos nextPos, Direction towards, BlockState nextState) {
 		// Check if the submarine is about to collide with another block.
+
+		final ISubmarineBlock block = nextState.getBlock() instanceof ISubmarineBlock b ? b : null;
 
 		if (block != null) {
 			// Check if the block allows or denies entry regardless of shape.
@@ -179,6 +206,18 @@ public class SubmarineEntity extends Entity {
 		}
 
 		return true;
+	}
+
+	protected boolean checkCollision(BlockPos oldPos, BlockPos nextPos, Direction towards) {
+		final BlockState nextState = level.getBlockState(nextPos);
+
+		if (!checkFluidCollision(oldPos, nextPos, towards, nextState))
+			return false;
+
+		if (!checkEntityCollision(oldPos, nextPos, towards))
+			return false;
+
+		return checkBlockCollision(oldPos, nextPos, towards, nextState);
 	}
 
 	protected void handleMovement() {
@@ -341,8 +380,11 @@ public class SubmarineEntity extends Entity {
 
 	@Override
 	public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-		if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-			return containerCap.cast();
+		if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+			if (side == null) return containerCap.cast();
+			if (side == Direction.UP) return fuelCap.cast();
+			return storageOnlyCap.cast();
+		}
 
 		return super.getCapability(cap, side);
 	}

@@ -15,6 +15,7 @@ import net.minecraft.world.item.ItemStack;
 
 import net.minecraftforge.network.NetworkHooks;
 
+import net.enderturret.itemsubs.SubmarineFuel;
 import net.enderturret.itemsubs.entity.SubmarineEntity;
 import net.enderturret.itemsubs.init.ISMenus;
 
@@ -50,8 +51,18 @@ public class SubmarineMenu extends AbstractContainerMenu {
 	protected void initSlots(Inventory playerInv) {
 		final Container con = submarine.getContainer();
 
-		addSlot(new Slot(con, 0, 62, 36)); // Fuel
-		addSlot(new Slot(con, 1, 98, 36)); // Upgrades
+		addSlot(new Slot(con, 0, 62, 36) { // Fuel
+			@Override
+			public boolean mayPlace(ItemStack stack) {
+				return SubmarineFuel.isValidFuel(stack);
+			}
+		});
+		addSlot(new Slot(con, 1, 98, 36) { // Upgrades
+			@Override
+			public boolean mayPlace(ItemStack stack) {
+				return false; // TODO: Upgrades
+			}
+		});
 
 		// Submarine inventory slots
 		for (int y = 0; y < 2; ++y)
