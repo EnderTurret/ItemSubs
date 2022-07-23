@@ -1,7 +1,9 @@
 package net.enderturret.itemsubs;
 
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import net.enderturret.itemsubs.init.ISBlockEntityTypes;
@@ -16,6 +18,8 @@ public class ItemSubs {
 	public static final String MOD_ID = "itemsubs";
 
 	public ItemSubs() {
+		ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, ISConfig.SERVER_SPEC);
+
 		final IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
 
 		ISBlockEntityTypes.REGISTRY.register(modBus);

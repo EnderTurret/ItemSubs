@@ -213,14 +213,14 @@ public class SubmarineEntity extends Entity {
 		return true;
 	}
 
-	protected boolean checkBlockCollision(BlockPos oldPos, BlockPos nextPos, Direction towards, BlockState nextState) {
+	public static boolean checkDefaultBlockCollision(Level level, BlockPos pos, @Nullable Direction towards, BlockState nextState, AABB subBounds, @Nullable SubmarineEntity sub) {
 		// Check if the submarine is about to collide with another block.
 
 		final ISubmarineBlock block = nextState.getBlock() instanceof ISubmarineBlock b ? b : null;
 
 		if (block != null) {
 			// Check if the block allows or denies entry regardless of shape.
-			final Boolean canEnter = block.canSubmarineEnter(nextState, level, nextPos, towards, this);
+			final Boolean canEnter = block.canSubmarineEnter(nextState, level, pos, towards, sub);
 			if (canEnter != null)
 				return canEnter;
 		}
@@ -228,19 +228,26 @@ public class SubmarineEntity extends Entity {
 		final VoxelShape coll;
 
 		if (block != null)
-			coll = block.getSubmarineCollisionShape(nextState, level, nextPos, this);
+			coll = block.getSubmarineCollisionShape(nextState, level, pos, sub);
 		else
-			coll = nextState.getCollisionShape(level, nextPos);
+			coll = nextState.getCollisionShape(level, pos);
 
 		if (!coll.isEmpty()) {
 			final AABB bounds = coll.bounds();
-			final AABB checkBounds = getBoundingBox().move(-oldPos.getX(), -oldPos.getY(), -oldPos.getZ());
 
-			if (bounds.intersects(checkBounds))
+			if (bounds.intersects(subBounds))
 				return false;
 		}
 
 		return true;
+	}
+
+	public static boolean checkDefaultBlockCollision(Level level, BlockPos pos, @Nullable Direction towards, BlockState nextState) {
+		return checkDefaultBlockCollision(level, pos, towards, nextState, ISEntityTypes.SUBMARINE.get().getAABB(0, 0, 0), null);
+	}
+
+	protected boolean checkBlockCollision(BlockPos oldPos, BlockPos nextPos, @Nullable Direction towards, BlockState nextState) {
+		return checkDefaultBlockCollision(level, nextPos, towards, nextState, getBoundingBox().move(-oldPos.getX(), -oldPos.getY(), -oldPos.getZ()), this);
 	}
 
 	protected boolean checkCollision(BlockPos oldPos, BlockPos nextPos, Direction towards) {

@@ -2,6 +2,7 @@ package net.enderturret.itemsubs.item;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -11,6 +12,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
 
+import net.enderturret.itemsubs.ISConfig;
 import net.enderturret.itemsubs.block.ISubmarineBlock;
 import net.enderturret.itemsubs.block.SubmarineStationBlock;
 import net.enderturret.itemsubs.entity.SubmarineEntity;
@@ -20,6 +22,14 @@ public class SubmarineItem extends Item {
 
 	public SubmarineItem(Item.Properties props) {
 		super(props);
+	}
+
+	protected boolean canPlace(Level level, BlockPos pos, BlockState state, UseOnContext ctx) {
+		return checkFluid(level, pos, state, ctx) && SubmarineEntity.checkDefaultBlockCollision(level, pos, null, state);
+	}
+
+	protected boolean checkFluid(Level level, BlockPos pos, BlockState state, UseOnContext ctx) {
+		return !ISConfig.get().realismMode() || state.getFluidState().is(FluidTags.WATER);
 	}
 
 	@Override
@@ -57,10 +67,11 @@ public class SubmarineItem extends Item {
 			facing = ctx.getHorizontalDirection();
 		}
 
-		final BlockState state = level.getBlockState(new BlockPos(spawnPos));
+		final BlockPos realPos = new BlockPos(spawnPos);
+		final BlockState state = level.getBlockState(realPos);
 
-		//if (!state.getFluidState().is(FluidTags.WATER))
-			//return InteractionResult.FAIL;
+		if (!canPlace(level, realPos, state, ctx))
+			return InteractionResult.FAIL;
 
 		final ItemStack stack = ctx.getItemInHand();
 

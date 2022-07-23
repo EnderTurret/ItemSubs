@@ -47,12 +47,12 @@ public interface ISubmarineBlock {
 	 * @param state The {@link BlockState} at {@code pos}.
 	 * @param level The world the block is in.
 	 * @param pos The location of the block in the world.
-	 * @param enterDirection The direction the submarine is entering from.
-	 * @param entity The submarine that is attempting to enter.
+	 * @param enterDirection The direction the submarine is entering from. If {@code null}, implies the submarine is being placed.
+	 * @param entity The submarine that is attempting to enter. {@code null} during placement.
 	 * @return Whether the submarine may enter from the given side, or {@code null} to check the collision shape.
 	 */
 	@Nullable
-	public default Boolean canSubmarineEnter(BlockState state, Level level, BlockPos pos, Direction enterDirection, SubmarineEntity entity) {
+	public default Boolean canSubmarineEnter(BlockState state, Level level, BlockPos pos, @Nullable Direction enterDirection, @Nullable SubmarineEntity entity) {
 		return null;
 	}
 

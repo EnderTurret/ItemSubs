@@ -11,7 +11,7 @@ public class SubmarineFuel {
 	}
 
 	public static int getBlocksTravelable(ItemStack fuel) {
-		return (int) ((getBurnTime(fuel) / 200F) * 5);
+		return (int) ((getBurnTime(fuel) / 200F) * ISConfig.get().distanceFromFuel());
 	}
 
 	public static int getBurnTime(ItemStack fuel) {
