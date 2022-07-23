@@ -61,7 +61,11 @@ public class SubmarineEntity extends Entity {
 	private static final EntityDataAccessor<Integer> HURT = SynchedEntityData.defineId(SubmarineEntity.class, EntityDataSerializers.INT);
 	private static final EntityDataAccessor<Integer> HURTDIR = SynchedEntityData.defineId(SubmarineEntity.class, EntityDataSerializers.INT);
 	private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(SubmarineEntity.class, EntityDataSerializers.FLOAT);
+
 	private static final EntityDataAccessor<Boolean> MOVING = SynchedEntityData.defineId(SubmarineEntity.class, EntityDataSerializers.BOOLEAN);
+
+	private static final EntityDataAccessor<Integer> BURN_TIME = SynchedEntityData.defineId(SubmarineEntity.class, EntityDataSerializers.INT);
+	private static final EntityDataAccessor<Integer> BURN_MAX = SynchedEntityData.defineId(SubmarineEntity.class, EntityDataSerializers.INT);
 
 	private static final Component NAME = Component.translatable("entity.itemsubs.submarine");
 
@@ -157,8 +161,27 @@ public class SubmarineEntity extends Entity {
 		handleMovement();
 	}
 
-	protected boolean canMove() {
-		return isMoving();
+	protected boolean checkMove() {
+		if (!isMoving()) return false;
+
+		if (getBurnTime() == 0) {
+			if (getBurnMax() != 0) setBurnMax(0);
+
+			final ItemStack fuel = container.getItem(0);
+			if (!fuel.isEmpty()) {
+				final int worth = SubmarineFuel.getBlocksTravelable(fuel);
+				if (worth > 0) {
+					fuel.shrink(1);
+					setBurnTime(worth);
+					setBurnMax(worth);
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		return true;
 	}
 
 	protected boolean checkEntityCollision(BlockPos oldPos, BlockPos nextPos, Direction towards) {
@@ -233,7 +256,7 @@ public class SubmarineEntity extends Entity {
 	protected void handleMovement() {
 		setOldPosAndRot();
 
-		if (canMove()) {
+		if (checkMove()) {
 			final Direction dir = getDirection();
 			final BlockPos oldPos = blockPosition();
 
@@ -254,6 +277,13 @@ public class SubmarineEntity extends Entity {
 				final Vec3 pos = position();
 				final BlockPos realPos = blockPosition();
 
+				final double xOffset = pos.x - realPos.getX();
+				final double zOffset = pos.z - realPos.getZ();
+				final boolean centered = isCentered(xOffset, zOffset);
+
+				if (centered)
+					setBurnTime(getBurnTime() - 1);
+
 				// Use a simple loop here to check at current position as well as below us.
 				for (int yOffset = 0; yOffset == 0 || yOffset == 1; yOffset++) {
 					final BlockPos offPos = realPos.below(yOffset);
@@ -262,10 +292,7 @@ public class SubmarineEntity extends Entity {
 					if (offState.getBlock() instanceof ISubmarineBlock block) {
 						block.onSubmarineOver(offState, level, offPos, this, yOffset == 1);
 
-						final double xOffset = pos.x - offPos.getX();
-						final double zOffset = pos.z - offPos.getZ();
-
-						if (xOffset > .49 && xOffset < .51 && zOffset > .49 && zOffset < .51) {
+						if (centered) {
 							// Turn in the direction of the block.
 							final Direction orientation = block.getOrientation(offState, level, offPos, this, yOffset == 1);
 							if (orientation != null)
@@ -336,6 +363,12 @@ public class SubmarineEntity extends Entity {
 		if (!container.isEmpty())
 			ContainerHelper2.saveAllItems(subStack.getOrCreateTag(), container, false);
 
+		if (getBurnTime() > 0)
+			subStack.getOrCreateTag().putInt("burnTime", getBurnTime());
+
+		if (getBurnMax() > 0)
+			subStack.getOrCreateTag().putInt("burnMax", getBurnMax());
+
 		if (hasCustomName())
 			subStack.setHoverName(getCustomName());
 	}
@@ -354,6 +387,8 @@ public class SubmarineEntity extends Entity {
 		entityData.define(HURTDIR, 1);
 		entityData.define(DAMAGE, 0F);
 		entityData.define(MOVING, false);
+		entityData.define(BURN_TIME, 0);
+		entityData.define(BURN_MAX, 0);
 	}
 
 	public void setDamage(float damageTaken) {
@@ -386,6 +421,22 @@ public class SubmarineEntity extends Entity {
 
 	public boolean isMoving() {
 		return entityData.get(MOVING);
+	}
+
+	public void setBurnTime(int burnTime) {
+		entityData.set(BURN_TIME, burnTime);
+	}
+
+	public int getBurnTime() {
+		return entityData.get(BURN_TIME);
+	}
+
+	public void setBurnMax(int burnMax) {
+		entityData.set(BURN_MAX, burnMax);
+	}
+
+	public int getBurnMax() {
+		return entityData.get(BURN_MAX);
 	}
 
 	@Override
@@ -426,22 +477,36 @@ public class SubmarineEntity extends Entity {
 
 		if (stack.getTag().contains("Items", Tag.TAG_LIST))
 			ContainerHelper2.loadAllItems(stack.getTag(), container);
+
+		if (stack.getTag().contains("burnTime", Tag.TAG_INT))
+			setBurnTime(stack.getTag().getInt("burnTime"));
+
+		if (stack.getTag().contains("burnMax", Tag.TAG_INT))
+			setBurnTime(stack.getTag().getInt("burnMax"));
 	}
 
 	@Override
 	protected void readAdditionalSaveData(CompoundTag tag) {
 		ContainerHelper2.loadAllItems(tag, container);
 		setMoving(tag.getBoolean("moving"));
+		setBurnTime(tag.getInt("burnTime"));
+		setBurnMax(tag.getInt("burnMax"));
 	}
 
 	@Override
 	protected void addAdditionalSaveData(CompoundTag tag) {
 		ContainerHelper2.saveAllItems(tag, container, true);
 		tag.putBoolean("moving", isMoving());
+		tag.putInt("burnTime", getBurnTime());
+		tag.putInt("burnMax", getBurnMax());
 	}
 
 	@Override
 	public Packet<?> getAddEntityPacket() {
 		return new ClientboundAddEntityPacket(this);
+	}
+
+	public static boolean isCentered(double xOffset, double zOffset) {
+		return xOffset > .49 && xOffset < .51 && zOffset > .49 && zOffset < .51;
 	}
 }
