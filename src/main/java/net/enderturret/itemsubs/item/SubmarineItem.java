@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
 
+import net.enderturret.itemsubs.block.SubmarineStationBlock;
 import net.enderturret.itemsubs.entity.SubmarineEntity;
 import net.enderturret.itemsubs.init.ISEntityTypes;
 
@@ -26,19 +27,34 @@ public class SubmarineItem extends Item {
 		final BlockPos pos = ctx.getClickedPos();
 		final Direction clickedFace = ctx.getClickedFace();
 
-		final double yOffset;
-		if (clickedFace == Direction.DOWN)
-			yOffset = -0.75;
-		else if (clickedFace == Direction.UP)
-			yOffset = 1.25;
-		else
-			yOffset = .25;
+		final Vec3 spawnPos;
+		final Direction facing;
 
-		final Vec3 spawnPos = new Vec3(
-				ctx.getClickedPos().getX() + clickedFace.getStepX() * 1 + 0.5,
-				ctx.getClickedPos().getY() + yOffset,
-				ctx.getClickedPos().getZ() + clickedFace.getStepZ() * 1 + 0.5
-				);
+		final BlockState startState = level.getBlockState(pos);
+		if (startState.getBlock() instanceof SubmarineStationBlock) {
+			spawnPos = new Vec3(
+					pos.getX() + .5,
+					pos.getY() + .25,
+					pos.getZ() + .5);
+			facing = startState.getValue(SubmarineStationBlock.FACING);
+		}
+
+		else {
+			final double yOffset;
+			if (clickedFace == Direction.DOWN)
+				yOffset = -0.75;
+			else if (clickedFace == Direction.UP)
+				yOffset = 1.25;
+			else
+				yOffset = .25;
+
+			spawnPos = new Vec3(
+					pos.getX() + clickedFace.getStepX() * 1 + 0.5,
+					pos.getY() + yOffset,
+					pos.getZ() + clickedFace.getStepZ() * 1 + 0.5
+					);
+			facing = ctx.getHorizontalDirection();
+		}
 
 		final BlockState state = level.getBlockState(new BlockPos(spawnPos));
 
@@ -50,7 +66,7 @@ public class SubmarineItem extends Item {
 		if (!level.isClientSide) {
 			final SubmarineEntity sub = ISEntityTypes.SUBMARINE.get().create(level);
 			sub.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
-			sub.setYRot(ctx.getHorizontalDirection().toYRot());
+			sub.setYRot(facing.toYRot());
 
 			sub.readItemData(stack);
 
