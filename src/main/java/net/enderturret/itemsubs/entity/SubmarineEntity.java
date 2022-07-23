@@ -19,6 +19,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -266,63 +267,69 @@ public class SubmarineEntity extends Entity {
 		setOldPosAndRot();
 
 		if (checkMove()) {
-			final Direction dir = getDirection();
-			final BlockPos oldPos = blockPosition();
+			final double blocksPerSecond = .5;
+			double speed = blocksPerSecond / 20;
 
-			final double speed = .5 / 20;
+			while (speed > 0) {
+				final double tempMotion = Mth.clamp(speed, 0, 0.05);
+				speed -= tempMotion;
 
-			final Vec3 movement = new Vec3(dir.getStepX() * speed, 0, dir.getStepZ() * speed);
+				final Direction dir = getDirection();
+				final BlockPos oldPos = blockPosition();
 
-			final BlockPos nextPos = new BlockPos(position()
-					.add(dir.getStepX() * getBbWidth() / 1.8, 0, dir.getStepZ() * getBbWidth() / 1.8)
-					.add(movement));
+				final Vec3 movement = new Vec3(dir.getStepX() * tempMotion, 0, dir.getStepZ() * tempMotion);
 
-			if (!oldPos.equals(nextPos) && !checkCollision(oldPos, nextPos, dir))
-				return;
+				final BlockPos nextPos = new BlockPos(position()
+						.add(dir.getStepX() * getBbWidth() / 1.8, 0, dir.getStepZ() * getBbWidth() / 1.8)
+						.add(movement));
 
-			move(MoverType.SELF, movement);
+				if (!oldPos.equals(nextPos) && !checkCollision(oldPos, nextPos, dir))
+					return;
 
-			if (!level.isClientSide) {
-				final Vec3 pos = position();
-				final BlockPos realPos = blockPosition();
+				move(MoverType.SELF, movement);
 
-				final double xOffset = pos.x - realPos.getX();
-				final double zOffset = pos.z - realPos.getZ();
-				final boolean centered = isCentered(xOffset, zOffset);
+				if (!level.isClientSide) {
+					final Vec3 pos = position();
+					final BlockPos realPos = blockPosition();
 
-				if (centered)
-					setBurnTime(getBurnTime() - 1);
+					final double xOffset = pos.x - realPos.getX();
+					final double zOffset = pos.z - realPos.getZ();
+					final boolean centered = isCentered(xOffset, zOffset);
 
-				// Use a simple loop here to check at current position as well as below us.
-				for (int yOffset = 0; yOffset == 0 || yOffset == 1; yOffset++) {
-					final BlockPos offPos = realPos.below(yOffset);
-					final BlockState offState = level.getBlockState(offPos);
+					if (centered)
+						setBurnTime(getBurnTime() - 1);
 
-					if (offState.getBlock() instanceof ISubmarineBlock block) {
-						block.onSubmarineOver(offState, level, offPos, this, yOffset == 1);
+					// Use a simple loop here to check at current position as well as below us.
+					for (int yOffset = 0; yOffset == 0 || yOffset == 1; yOffset++) {
+						final BlockPos offPos = realPos.below(yOffset);
+						final BlockState offState = level.getBlockState(offPos);
 
-						if (centered) {
-							// Turn in the direction of the block.
-							final Direction orientation = block.getOrientation(offState, level, offPos, this, yOffset == 1);
-							if (orientation != null)
-								setYRot(orientation.toYRot());
+						if (offState.getBlock() instanceof ISubmarineBlock block) {
+							block.onSubmarineOver(offState, level, offPos, this, yOffset == 1);
 
-							// Correct position so that the submarine doesn't start drifting off.
-							setPos(new Vec3(offPos.getX() + .5, pos.y, offPos.getZ() + .5));
+							if (centered) {
+								// Turn in the direction of the block.
+								final Direction orientation = block.getOrientation(offState, level, offPos, this, yOffset == 1);
+								if (orientation != null)
+									setYRot(orientation.toYRot());
 
-							// Notify the block.
-							block.onSubmarineDocked(offState, level, offPos, this, yOffset == 1);
+								// Correct position so that the submarine doesn't start drifting off.
+								setPos(new Vec3(offPos.getX() + .5, pos.y, offPos.getZ() + .5));
+
+								// Notify the block.
+								block.onSubmarineDocked(offState, level, offPos, this, yOffset == 1);
+							}
+
+							break;
 						}
 
-						break;
-					}
-
-					else if (!oldPos.equals(realPos)) {
-						final BlockPos pastPos = oldPos.below(yOffset);
-						final BlockState pastState = level.getBlockState(pastPos);
-						if (pastState.getBlock() instanceof ISubmarineBlock block) {
-							block.onSubmarineLeaving(pastState, level, pastPos, this, yOffset == 1);
-							break;
+						else if (!oldPos.equals(realPos)) {
+							final BlockPos pastPos = oldPos.below(yOffset);
+							final BlockState pastState = level.getBlockState(pastPos);
+							if (pastState.getBlock() instanceof ISubmarineBlock block) {
+								block.onSubmarineLeaving(pastState, level, pastPos, this, yOffset == 1);
+								break;
+							}
 						}
 					}
 				}
