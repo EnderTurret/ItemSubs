@@ -15,8 +15,8 @@ public class ISBlocks {
 
 	public static final DeferredRegister<Block> REGISTRY = DeferredRegister.create(ForgeRegistries.BLOCKS, ItemSubs.MOD_ID);
 
-	public static final RegistryObject<Block> SUBMARINE_RELAY = REGISTRY.register("submarine_relay", () -> new SubmarineRelayBlock(props(Material.METAL)));
-	public static final RegistryObject<Block> SUBMARINE_STATION = REGISTRY.register("submarine_station", () -> new SubmarineStationBlock(props(Material.METAL)));
+	public static final RegistryObject<Block> SUBMARINE_RELAY = REGISTRY.register("submarine_relay", () -> new SubmarineRelayBlock(props(Material.METAL).strength(1.5F, 6F).requiresCorrectToolForDrops()));
+	public static final RegistryObject<Block> SUBMARINE_STATION = REGISTRY.register("submarine_station", () -> new SubmarineStationBlock(props(Material.METAL).strength(1.5F, 6F).requiresCorrectToolForDrops()));
 
 	private static Block.Properties props(Material material) {
 		return Block.Properties.of(material);
