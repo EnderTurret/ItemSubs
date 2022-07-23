@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "AAA",
+    "SSS",
+    "AAA"
+  ],
+  "key": {
+    "A": {
+      "item": "minecraft:polished_andesite"
+    },
+    "S": {
+      "item": "minecraft:smooth_stone"
+    }
+  },
+  "result": {
+    "item": "itemsubs:submarine_relay",
+    "count": 2
+  }
+}
