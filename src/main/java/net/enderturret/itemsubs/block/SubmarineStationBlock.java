@@ -111,4 +111,21 @@ public class SubmarineStationBlock extends WaterloggedHorizontalBlock implements
 	public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
 		return STATES[state.getValue(FACING).get2DDataValue()];
 	}
+
+	@Override
+	public void onSubmarineInventoryChanged(BlockState state, Level level, BlockPos pos, SubmarineEntity entity) {
+		((SubmarineStationBlockEntity) level.getBlockEntity(pos)).onSubmarineInventoryChanged(state, level, pos, entity);
+	}
+
+	@SuppressWarnings("deprecation")
+	@Override
+	public boolean hasAnalogOutputSignal(BlockState state) {
+		return true;
+	}
+
+	@SuppressWarnings("deprecation")
+	@Override
+	public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+		return ((SubmarineStationBlockEntity) level.getBlockEntity(pos)).getAnalogOutputSignal(state, level, pos);
+	}
 }

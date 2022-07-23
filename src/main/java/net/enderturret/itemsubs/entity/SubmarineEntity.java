@@ -90,6 +90,14 @@ public class SubmarineEntity extends Entity {
 
 	public SubmarineEntity(EntityType<? extends SubmarineEntity> type, Level level) {
 		super(type, level);
+		container.addListener(_c -> {
+			if (this.level == null) return;
+
+			final BlockState state = this.level.getBlockState(blockPosition());
+
+			if (state.getBlock() instanceof ISubmarineBlock block)
+				block.onSubmarineInventoryChanged(state, this.level, blockPosition(), this);
+		});
 	}
 
 	public SubmarineEntity(Level level) {

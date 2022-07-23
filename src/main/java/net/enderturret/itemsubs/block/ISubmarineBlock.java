@@ -93,4 +93,13 @@ public interface ISubmarineBlock {
 	 * @param over Whether the submarine is over this block or inside it.
 	 */
 	public default void onSubmarineLeaving(BlockState state, Level level, BlockPos pos, SubmarineEntity entity, boolean over) {}
+
+	/**
+	 * Called when a submarine's inventory changes while inside this block.
+	 * @param state The {@link BlockState} at {@code pos}.
+	 * @param level The world the block is in.
+	 * @param pos The location of the block in the world.
+	 * @param entity The submarine whose inventory has changed.
+	 */
+	public default void onSubmarineInventoryChanged(BlockState state, Level level, BlockPos pos, SubmarineEntity entity) {}
 }
