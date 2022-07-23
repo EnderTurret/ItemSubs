@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
 
+import net.enderturret.itemsubs.block.ISubmarineBlock;
 import net.enderturret.itemsubs.block.SubmarineStationBlock;
 import net.enderturret.itemsubs.entity.SubmarineEntity;
 import net.enderturret.itemsubs.init.ISEntityTypes;
@@ -72,6 +73,9 @@ public class SubmarineItem extends Item {
 
 			level.addFreshEntity(sub);
 			level.gameEvent(GameEvent.ENTITY_PLACE, pos, GameEvent.Context.of(ctx.getPlayer(), level.getBlockState(pos.below())));
+
+			if (state.getBlock() instanceof ISubmarineBlock block)
+				block.onSubmarineDocked(state, level, pos, sub, false);
 		}
 
 		stack.shrink(1);
