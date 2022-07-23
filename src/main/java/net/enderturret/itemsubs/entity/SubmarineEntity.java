@@ -162,6 +162,10 @@ public class SubmarineEntity extends Entity {
 		handleMovement();
 	}
 
+	protected double getSpeed() {
+		return .5;
+	}
+
 	protected boolean checkMove() {
 		if (!isMoving()) return false;
 
@@ -267,7 +271,7 @@ public class SubmarineEntity extends Entity {
 		setOldPosAndRot();
 
 		if (checkMove()) {
-			final double blocksPerSecond = .5;
+			final double blocksPerSecond = getSpeed();
 			double speed = blocksPerSecond / 20;
 
 			while (speed > 0) {
