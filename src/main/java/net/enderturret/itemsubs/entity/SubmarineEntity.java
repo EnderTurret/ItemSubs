@@ -171,7 +171,9 @@ public class SubmarineEntity extends Entity {
 			if (!fuel.isEmpty()) {
 				final int worth = SubmarineFuel.getBlocksTravelable(fuel);
 				if (worth > 0) {
-					fuel.shrink(1);
+					if (fuel.hasCraftingRemainingItem())
+						container.setItem(0, fuel.getCraftingRemainingItem());
+					else fuel.shrink(1);
 					setBurnTime(worth);
 					setBurnMax(worth);
 					return true;
