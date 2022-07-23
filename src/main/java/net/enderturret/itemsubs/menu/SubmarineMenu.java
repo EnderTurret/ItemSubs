@@ -4,6 +4,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
@@ -22,10 +23,12 @@ import net.enderturret.itemsubs.init.ISMenus;
 public class SubmarineMenu extends AbstractContainerMenu {
 
 	public final SubmarineEntity submarine;
+	public final SimpleContainer con;
 
 	public SubmarineMenu(MenuType<?> menuType, int containerId, Inventory playerInventory, SubmarineEntity submarine) {
 		super(menuType, containerId);
 		this.submarine = submarine;
+		con = submarine.getContainer();
 		initSlots(playerInventory);
 	}
 
@@ -81,7 +84,38 @@ public class SubmarineMenu extends AbstractContainerMenu {
 
 	@Override
 	public ItemStack quickMoveStack(Player player, int index) {
-		return ItemStack.EMPTY;
+		ItemStack stack = ItemStack.EMPTY;
+		final Slot slot = getSlot(index);
+
+		if (slot != null && slot.hasItem()) {
+			final ItemStack slotStack = slot.getItem();
+			stack = slotStack.copy();
+
+			// If the slot is in the submarine inventory...
+			if (index < con.getContainerSize()) { // We're subtracting two because reserved slots.
+				// ... try to place it in the player inventory.
+				// Note that slots is a list of all slots in the container.
+				if (!moveItemStackTo(slotStack, con.getContainerSize() - 2, slots.size() - 9, true))
+					return ItemStack.EMPTY;
+			}
+
+			// Try to put it in the fuel slot.
+			else if (getSlot(0).mayPlace(slotStack) && !getSlot(0).hasItem()) {
+				if (!moveItemStackTo(slotStack, 0, 1, false))
+					return ItemStack.EMPTY;
+			}
+
+			// Try to put it in the submarine inventory.
+			else if (!moveItemStackTo(slotStack, 2, con.getContainerSize(), false))
+				return ItemStack.EMPTY;
+
+			if (slotStack.isEmpty())
+				slot.set(ItemStack.EMPTY);
+			else
+				slot.setChanged();
+		}
+
+		return stack;
 	}
 
 	@Override
