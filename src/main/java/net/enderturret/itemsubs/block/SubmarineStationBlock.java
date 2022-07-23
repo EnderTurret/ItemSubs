@@ -24,6 +24,11 @@ public class SubmarineStationBlock extends WaterloggedHorizontalBlock implements
 
 	public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
+	private static final VoxelShape[] OCCLUSION = CollisionSupport.horizontal(
+			CollisionSupport.of(
+					box(0, 0, 0, 16, 3, 16),
+					box(0, 3, 15, 16, 16, 16)), Direction.NORTH);
+
 	private static final VoxelShape[] STATES = CollisionSupport.horizontal(
 			CollisionSupport.of(
 					box(0, 0, 0, 16, 3, 16),
@@ -34,6 +39,12 @@ public class SubmarineStationBlock extends WaterloggedHorizontalBlock implements
 	public SubmarineStationBlock(Properties props) {
 		super(props);
 		registerDefaultState(defaultBlockState().setValue(POWERED, false));
+	}
+
+	@SuppressWarnings("deprecation")
+	@Override
+	public VoxelShape getOcclusionShape(BlockState state, BlockGetter level, BlockPos pos) {
+		return OCCLUSION[state.getValue(FACING).get2DDataValue()];
 	}
 
 	@Override
