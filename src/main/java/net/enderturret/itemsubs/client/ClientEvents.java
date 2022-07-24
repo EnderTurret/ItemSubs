@@ -41,6 +41,6 @@ public class ClientEvents {
 
 	@EventBusSubscriber(modid = ItemSubs.MOD_ID, bus = EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 	static class Forge {
-		
+
 	}
 }

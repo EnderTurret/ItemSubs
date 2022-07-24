@@ -1,8 +1,5 @@
 package net.enderturret.itemsubs.entity;
 
-import static net.enderturret.itemsubs.block.SubmarinePresence.*;
-import static net.enderturret.itemsubs.block.SubmarineRelayBlock.PRESENCE;
-
 import java.util.List;
 
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +17,6 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleContainer;
@@ -51,8 +47,6 @@ import net.minecraftforge.items.wrapper.InvWrapper;
 import net.enderturret.itemsubs.ISConfig;
 import net.enderturret.itemsubs.SubmarineFuel;
 import net.enderturret.itemsubs.block.ISubmarineBlock;
-import net.enderturret.itemsubs.block.SubmarinePresence;
-import net.enderturret.itemsubs.block.SubmarineRelayBlock;
 import net.enderturret.itemsubs.init.ISEntityTypes;
 import net.enderturret.itemsubs.init.ISItems;
 import net.enderturret.itemsubs.item.SpeedUpgradeItem;
@@ -145,9 +139,8 @@ public class SubmarineEntity extends Entity {
 				PiglinAi.angerNearbyPiglins(player, true);
 				return InteractionResult.CONSUME;
 			}
-		} else if (!player.level.isClientSide) {
+		} else if (!player.level.isClientSide)
 			setMoving(!isMoving());
-		}
 
 		return InteractionResult.SUCCESS;
 	}
@@ -323,12 +316,11 @@ public class SubmarineEntity extends Entity {
 
 				if (!oldPos.equals(nextPos)) {
 					final CollisionResult res = checkCollision(oldPos, nextPos, dir);
-					if (res.wouldCollide()) {
+					if (res.wouldCollide())
 						if (couldExplode && res instanceof CollisionResult.Entity entity
 								&& entity.entity() instanceof SubmarineEntity) {}
 						else
 							return;
-					}
 				}
 
 				final Vec3 oldLoc = position();
@@ -420,8 +412,6 @@ public class SubmarineEntity extends Entity {
 
 				discard();
 			}
-
-			return true;
 		}
 
 		return true;

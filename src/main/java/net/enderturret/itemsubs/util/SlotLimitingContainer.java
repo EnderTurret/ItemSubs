@@ -91,8 +91,7 @@ public class SlotLimitingContainer implements Container, StackedContentsCompatib
 
 	@Override
 	public void fillStackedContents(StackedContents helper) {
-		for (int slot = 0; slot < size; slot++) {
+		for (int slot = 0; slot < size; slot++)
 			helper.accountStack(getItem(slotOffset + slot));
-		}
 	}
 }
