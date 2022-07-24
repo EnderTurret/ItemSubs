@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " S ",
+    "SsS",
+    " S "
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:smooth_stone"
+    },
+    "s": {
+      "type": "forge:partial_nbt",
+      "item": "minecraft:potion",
+      "nbt": { "Potion": "minecraft:swiftness" }
+    }
+  },
+  "result": {
+    "item": "itemsubs:speed_upgrade"
+  }
+}
