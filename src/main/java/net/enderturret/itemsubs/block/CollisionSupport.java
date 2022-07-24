@@ -17,7 +17,7 @@ public class CollisionSupport {
 	}
 
 	public static VoxelShape rotate(VoxelShape shape, Direction from, Direction to) {
-		final VoxelShape[] buffer = new VoxelShape[] { shape, Shapes.empty() };
+		final VoxelShape[] buffer = { shape, Shapes.empty() };
 
 		final int times = (to.get2DDataValue() - from.get2DDataValue() + 4) % 4;
 		for (int i = 0; i < times; i++) {
