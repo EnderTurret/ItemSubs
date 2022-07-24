@@ -26,15 +26,20 @@ public class SubmarineStationBlock extends WaterloggedHorizontalBlock implements
 
 	private static final VoxelShape[] OCCLUSION = CollisionSupport.horizontal(
 			CollisionSupport.of(
-					box(0, 0, 0, 16, 3, 16),
-					box(0, 3, 15, 16, 16, 16)), Direction.NORTH);
+					box(0, 0, 0, 16, 3, 16), // base
+					box(0, 3, 15, 16, 16, 16) // back wall
+					), Direction.NORTH);
 
 	private static final VoxelShape[] STATES = CollisionSupport.horizontal(
 			CollisionSupport.of(
-					box(0, 0, 0, 16, 3, 16),
-					box(0, 3, 0, 1, 16, 16),
-					box(15, 3, 0, 16, 16, 16),
-					box(0, 3, 15, 16, 16, 16)), Direction.NORTH);
+					box(0, 0, 0, 16, 3, 16), // base
+					box(0, 3, 0, 1, 16, 16), // right wall
+					box(15, 3, 0, 16, 16, 16), // left wall
+					box(0, 3, 15, 16, 16, 16), // back wall
+					box(1, 15, 7, 6, 16, 9), // right top bar
+					box(10, 15, 7, 15, 16, 9), // left top bar
+					box(6, 15, 6, 10, 16, 10) // center top component
+					), Direction.NORTH);
 
 	public SubmarineStationBlock(Properties props) {
 		super(props);
