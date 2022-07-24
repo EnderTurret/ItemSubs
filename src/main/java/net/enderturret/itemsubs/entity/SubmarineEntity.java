@@ -201,13 +201,15 @@ public class SubmarineEntity extends Entity {
 		return true;
 	}
 
-	protected boolean checkEntityCollision(BlockPos oldPos, BlockPos nextPos, Direction towards) {
+	@Nullable
+	protected CollisionResult.Entity checkEntityCollision(BlockPos oldPos, BlockPos nextPos, Direction towards) {
 		final AABB bounds = getBoundingBox().move(towards.getStepX(), towards.getStepY(), towards.getStepZ());
 		final List<Entity> entities = level.getEntities(this, new AABB(nextPos), e -> e.isPickable() && e.getBoundingBox().intersects(bounds));
-		return entities.isEmpty();
+		return entities.isEmpty() ? null : new CollisionResult.Entity(entities.get(0));
 	}
 
-	protected boolean checkFluidCollision(BlockPos oldPos, BlockPos nextPos, Direction towards, BlockState nextState) {
+	@Nullable
+	protected CollisionResult.Fluid checkFluidCollision(BlockPos oldPos, BlockPos nextPos, Direction towards, BlockState nextState) {
 		// Check if the submarine is about to leave or enter water.
 		// This tries to avoid breaking immersion by having a submarine just yeet out of (or into) the ocean.
 		// This should not affect already-levitating submarines.
@@ -223,9 +225,9 @@ public class SubmarineEntity extends Entity {
 		if (currentType != nextType // If both fluids mismatch...
 				&& (!currentType.isSame(nextType) // ... and both fluids are not the same kind...
 						|| currentFluid.isSource() && !nextFluid.isSource())) // or the current fluid is a source block and the next fluid is not,
-			return false; // Don't move forward.
+			return new CollisionResult.Fluid(nextFluid); // Don't move forward.
 
-		return true;
+		return null;
 	}
 
 	public static boolean checkDefaultBlockCollision(Level level, BlockPos pos, @Nullable Direction towards, BlockState nextState, AABB subBounds, @Nullable SubmarineEntity sub) {
@@ -261,20 +263,27 @@ public class SubmarineEntity extends Entity {
 		return checkDefaultBlockCollision(level, pos, towards, nextState, ISEntityTypes.SUBMARINE.get().getAABB(0, 0, 0), null);
 	}
 
-	protected boolean checkBlockCollision(BlockPos oldPos, BlockPos nextPos, @Nullable Direction towards, BlockState nextState) {
-		return checkDefaultBlockCollision(level, nextPos, towards, nextState, getBoundingBox().move(-oldPos.getX(), -oldPos.getY(), -oldPos.getZ()), this);
+	@Nullable
+	protected CollisionResult.Block checkBlockCollision(BlockPos oldPos, BlockPos nextPos, @Nullable Direction towards, BlockState nextState) {
+		return checkDefaultBlockCollision(level, nextPos, towards, nextState, getBoundingBox().move(-oldPos.getX(), -oldPos.getY(), -oldPos.getZ()), this)
+				? null : new CollisionResult.Block(nextState);
 	}
 
-	protected boolean checkCollision(BlockPos oldPos, BlockPos nextPos, Direction towards) {
+	protected CollisionResult checkCollision(BlockPos oldPos, BlockPos nextPos, Direction towards) {
 		final BlockState nextState = level.getBlockState(nextPos);
 
-		if (!checkFluidCollision(oldPos, nextPos, towards, nextState))
-			return false;
+		CollisionResult res;
 
-		if (!checkEntityCollision(oldPos, nextPos, towards))
-			return false;
+		if ((res = checkFluidCollision(oldPos, nextPos, towards, nextState)) != null)
+			return res;
 
-		return checkBlockCollision(oldPos, nextPos, towards, nextState);
+		if ((res = checkEntityCollision(oldPos, nextPos, towards)) != null)
+			return res;
+
+		if ((res = checkBlockCollision(oldPos, nextPos, towards, nextState)) != null)
+			return res;
+
+		return CollisionResult.NoCollision.INSTANCE;
 	}
 
 	private BlockPos lastCenteredPos = null;
@@ -299,8 +308,12 @@ public class SubmarineEntity extends Entity {
 						.add(dir.getStepX() * getBbWidth() / 1.8, 0, dir.getStepZ() * getBbWidth() / 1.8)
 						.add(movement));
 
-				if (!oldPos.equals(nextPos) && !checkCollision(oldPos, nextPos, dir))
-					return;
+				if (!oldPos.equals(nextPos)) {
+					final CollisionResult res = checkCollision(oldPos, nextPos, dir);
+					if (res.wouldCollide()) {
+						return;
+					}
+				}
 
 				move(MoverType.SELF, movement);
 
