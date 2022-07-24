@@ -2,6 +2,7 @@ package net.enderturret.itemsubs;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
+import net.minecraftforge.common.ForgeConfigSpec.DoubleValue;
 import net.minecraftforge.common.ForgeConfigSpec.IntValue;
 
 public class ISConfig {
@@ -17,6 +18,7 @@ public class ISConfig {
 
 	private final BooleanValue realismMode;
 	private final IntValue distanceFromFuel;
+	private final DoubleValue speedUpgradeModifier;
 
 	private ISConfig(ForgeConfigSpec.Builder builder) {
 		realismMode = builder
@@ -28,6 +30,11 @@ public class ISConfig {
 				.comment("The number of blocks a submarine will travel per item smeltable from fuel.",
 						"For example, a piece of coal smelts 8 items, so a submarine can move 40 (8 * 5) blocks with one (assuming a distanceFromFuel value of 5.)")
 				.defineInRange("distanceFromFuel", 5, 1, Integer.MAX_VALUE);
+		speedUpgradeModifier = builder
+				.comment("The modifier effect a single speed upgrade has on a submarine.",
+						"This value increases linearly for every speed upgrade added.",
+						"The exact formula is .5 + speedUpgradeModifier * upgradeCount.")
+				.defineInRange("speedUpgradeModifier", .25, 0, Double.MAX_VALUE);
 	}
 
 	public boolean realismMode() {
@@ -36,6 +43,10 @@ public class ISConfig {
 
 	public int distanceFromFuel() {
 		return distanceFromFuel.get();
+	}
+
+	public double speedUpgradeModifier() {
+		return speedUpgradeModifier.get();
 	}
 
 	public static ISConfig get() {

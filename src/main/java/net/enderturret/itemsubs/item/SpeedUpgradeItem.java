@@ -3,6 +3,8 @@ package net.enderturret.itemsubs.item;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
+import net.enderturret.itemsubs.ISConfig;
+
 // https://xkcd.com/927
 public class SpeedUpgradeItem extends Item {
 
@@ -11,6 +13,6 @@ public class SpeedUpgradeItem extends Item {
 	}
 
 	public double getSpeedModifier(ItemStack stack) {
-		return .25 * stack.getCount();
+		return ISConfig.get().speedUpgradeModifier() * stack.getCount();
 	}
 }
