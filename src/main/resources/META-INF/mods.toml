@@ -1,14 +1,17 @@
 modLoader="javafml"
 loaderVersion="[41,)"
 license="LGPL v2.1"
+issueTrackerURL="https://github.com/EnderTurret/ItemSubs/issues"
+
 [[mods]]
     modId="itemsubs"
     displayName="Item Subs"
     description='''
-    Subaquatic item transport.
+    Adds subaquatic item transport in the form of item submarines!
     '''
     version="${file.jarVersion}"
     authors="EnderTurret, Dustskys"
+    displayURL="https://github.com/EnderTurret/ItemSubs"
 
 [[dependencies.itemsubs]]
     modId="forge"
