@@ -53,6 +53,7 @@ import net.enderturret.itemsubs.block.SubmarinePresence;
 import net.enderturret.itemsubs.block.SubmarineRelayBlock;
 import net.enderturret.itemsubs.init.ISEntityTypes;
 import net.enderturret.itemsubs.init.ISItems;
+import net.enderturret.itemsubs.item.SpeedUpgradeItem;
 import net.enderturret.itemsubs.menu.SubmarineMenu;
 import net.enderturret.itemsubs.util.ContainerHelper2;
 import net.enderturret.itemsubs.util.SlotLimitingContainer;
@@ -80,7 +81,7 @@ public class SubmarineEntity extends Entity {
 			if (index == 0)
 				return SubmarineFuel.isValidFuel(stack);
 			if (index == 1)
-				return false; // TODO: Upgrades
+				return stack.getItem() instanceof SpeedUpgradeItem;
 			return true;
 		}
 	};
@@ -163,7 +164,16 @@ public class SubmarineEntity extends Entity {
 	}
 
 	protected double getSpeed() {
-		return .5;
+		final ItemStack upgradeStack = container.getItem(1);
+		final double upgradeModifier;
+
+		// You might think an isEmpty() check here would be enough, but unfortunately commands like /data exist.
+		if (!upgradeStack.isEmpty() && upgradeStack.getItem() instanceof SpeedUpgradeItem speed)
+			upgradeModifier = speed.getSpeedModifier(upgradeStack);
+		else
+			upgradeModifier = 0;
+
+		return .5 + upgradeModifier;
 	}
 
 	protected boolean checkMove() {

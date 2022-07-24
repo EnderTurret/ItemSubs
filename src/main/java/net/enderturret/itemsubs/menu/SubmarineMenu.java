@@ -19,6 +19,7 @@ import net.minecraftforge.network.NetworkHooks;
 import net.enderturret.itemsubs.SubmarineFuel;
 import net.enderturret.itemsubs.entity.SubmarineEntity;
 import net.enderturret.itemsubs.init.ISMenus;
+import net.enderturret.itemsubs.item.SpeedUpgradeItem;
 
 public class SubmarineMenu extends AbstractContainerMenu {
 
@@ -63,7 +64,7 @@ public class SubmarineMenu extends AbstractContainerMenu {
 		addSlot(new Slot(con, 1, 98, 36) { // Upgrades
 			@Override
 			public boolean mayPlace(ItemStack stack) {
-				return false; // TODO: Upgrades
+				return stack.getItem() instanceof SpeedUpgradeItem;
 			}
 		});
 
