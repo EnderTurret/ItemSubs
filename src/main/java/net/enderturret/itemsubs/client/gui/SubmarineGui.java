@@ -15,8 +15,10 @@ import net.enderturret.itemsubs.menu.SubmarineMenu;
 public class SubmarineGui extends AbstractContainerScreen<SubmarineMenu> {
 
 	private static final ResourceLocation TEXTURE = new ResourceLocation(ItemSubs.MOD_ID, "textures/gui/submarine.png");
+	private static final ResourceLocation DECOR_TEXTURE = new ResourceLocation(ItemSubs.MOD_ID, "textures/gui/decorative_submarine.png");
 
 	private final SubmarineEntity sub;
+	private final boolean decor;
 
 	public SubmarineGui(SubmarineMenu menu, Inventory playerInventory, Component title) {
 		super(menu, playerInventory, title);
@@ -24,15 +26,20 @@ public class SubmarineGui extends AbstractContainerScreen<SubmarineMenu> {
 		imageWidth = 176;
 		imageHeight = 204;
 		inventoryLabelY = imageHeight - 94;
+
+		if (sub != null) decor = sub.isDecorative();
+		// I'm not sure if this is possible, but just in case...
+		// Guess decorative based on if the first slot is the upgrade slot.
+		else decor = menu.slots.get(0).index == 1;
 	}
 
 	@Override
 	protected void renderBg(PoseStack poseStack, float partialTick, int mouseX, int mouseY) {
-		RenderSystem.setShaderTexture(0, TEXTURE);
+		RenderSystem.setShaderTexture(0, decor ? DECOR_TEXTURE : TEXTURE);
 
 		blit(poseStack, leftPos, topPos, 0, 0, imageWidth, imageHeight, 256, 256);
 
-		if (sub != null) {
+		if (sub != null && !decor) {
 			final int burnTime = sub.getBurnTime();
 			final int burnMax = sub.getBurnMax();
 

@@ -54,14 +54,17 @@ public class SubmarineMenu extends AbstractContainerMenu {
 
 	protected void initSlots(Inventory playerInv) {
 		final Container con = submarine.getContainer();
+		final boolean decor = submarine.isDecorative();
 
-		addSlot(new Slot(con, 0, 62, 36) { // Fuel
-			@Override
-			public boolean mayPlace(ItemStack stack) {
-				return SubmarineFuel.isValidFuel(stack);
-			}
-		});
-		addSlot(new Slot(con, 1, 98, 36) { // Upgrades
+		if (!decor)
+			addSlot(new Slot(con, 0, 62, 36) { // Fuel
+				@Override
+				public boolean mayPlace(ItemStack stack) {
+					return SubmarineFuel.isValidFuel(stack);
+				}
+			});
+
+		addSlot(new Slot(con, 1, decor ? 80 : 98, 36) { // Upgrades
 			@Override
 			public boolean mayPlace(ItemStack stack) {
 				return stack.getItem() instanceof SpeedUpgradeItem;
@@ -69,9 +72,10 @@ public class SubmarineMenu extends AbstractContainerMenu {
 		});
 
 		// Submarine inventory slots
-		for (int y = 0; y < 2; ++y)
-			for (int x = 0; x < 9; ++x)
-				addSlot(new Slot(con, 2 + x + y * 9, 8 + x * 18, 72 + y * 18));
+		if (!decor)
+			for (int y = 0; y < 2; ++y)
+				for (int x = 0; x < 9; ++x)
+					addSlot(new Slot(con, 2 + x + y * 9, 8 + x * 18, 72 + y * 18));
 
 		// Player inventory slots
 		for (int y = 0; y < 3; ++y)

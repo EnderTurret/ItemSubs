@@ -65,6 +65,8 @@ public class SubmarineEntity extends Entity {
 	private static final EntityDataAccessor<Integer> BURN_TIME = SynchedEntityData.defineId(SubmarineEntity.class, EntityDataSerializers.INT);
 	private static final EntityDataAccessor<Integer> BURN_MAX = SynchedEntityData.defineId(SubmarineEntity.class, EntityDataSerializers.INT);
 
+	private static final EntityDataAccessor<Boolean> DECORATIVE = SynchedEntityData.defineId(SubmarineEntity.class, EntityDataSerializers.BOOLEAN);
+
 	private static final Component NAME = Component.translatable("entity.itemsubs.submarine");
 
 	private final SimpleContainer container = new SimpleContainer(9 * 2 + 2) {
@@ -174,7 +176,7 @@ public class SubmarineEntity extends Entity {
 	protected boolean checkMove() {
 		if (!isMoving()) return false;
 
-		if (getBurnTime() == 0) {
+		if (!isDecorative() && getBurnTime() == 0) {
 			if (getBurnMax() != 0) setBurnMax(0);
 
 			final ItemStack fuel = container.getItem(0);
@@ -458,6 +460,7 @@ public class SubmarineEntity extends Entity {
 		entityData.define(MOVING, false);
 		entityData.define(BURN_TIME, 0);
 		entityData.define(BURN_MAX, 0);
+		entityData.define(DECORATIVE, false);
 	}
 
 	public void setDamage(float damageTaken) {
@@ -508,9 +511,17 @@ public class SubmarineEntity extends Entity {
 		return entityData.get(BURN_MAX);
 	}
 
+	public void setDecorative(boolean decorative) {
+		entityData.set(DECORATIVE, decorative);
+	}
+
+	public boolean isDecorative() {
+		return entityData.get(DECORATIVE);
+	}
+
 	@Override
 	public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-		if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+		if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && !isDecorative()) {
 			if (side == null) return containerCap.cast();
 			if (side == Direction.UP) return fuelCap.cast();
 			return storageOnlyCap.cast();
@@ -552,6 +563,9 @@ public class SubmarineEntity extends Entity {
 
 		if (stack.getTag().contains("burnMax", Tag.TAG_INT))
 			setBurnTime(stack.getTag().getInt("burnMax"));
+
+		if (stack.getTag().contains("decorative", Tag.TAG_BYTE))
+			setDecorative(stack.getTag().getBoolean("decorative"));
 	}
 
 	@Override
@@ -560,6 +574,7 @@ public class SubmarineEntity extends Entity {
 		setMoving(tag.getBoolean("moving"));
 		setBurnTime(tag.getInt("burnTime"));
 		setBurnMax(tag.getInt("burnMax"));
+		setDecorative(tag.getBoolean("decorative"));
 	}
 
 	@Override
@@ -568,6 +583,7 @@ public class SubmarineEntity extends Entity {
 		tag.putBoolean("moving", isMoving());
 		tag.putInt("burnTime", getBurnTime());
 		tag.putInt("burnMax", getBurnMax());
+		tag.putBoolean("decorative", isDecorative());
 	}
 
 	@Override
