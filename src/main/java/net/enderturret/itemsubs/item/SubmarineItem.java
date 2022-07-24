@@ -1,9 +1,14 @@
 package net.enderturret.itemsubs.item;
 
+import java.util.function.Consumer;
+
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
@@ -12,9 +17,14 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
 
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import net.minecraftforge.fml.DistExecutor;
+
 import net.enderturret.itemsubs.ISConfig;
 import net.enderturret.itemsubs.block.ISubmarineBlock;
 import net.enderturret.itemsubs.block.SubmarineStationBlock;
+import net.enderturret.itemsubs.client.ClientEvents;
 import net.enderturret.itemsubs.entity.SubmarineEntity;
 import net.enderturret.itemsubs.init.ISEntityTypes;
 
@@ -22,6 +32,17 @@ public class SubmarineItem extends Item {
 
 	public SubmarineItem(Item.Properties props) {
 		super(props);
+	}
+
+	@Override
+	@Nullable
+	public EquipmentSlot getEquipmentSlot(ItemStack stack) {
+		return EquipmentSlot.HEAD;
+	}
+
+	@Override
+	public void initializeClient(Consumer<IClientItemExtensions> consumer) {
+		DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> consumer.accept(ClientEvents.getSubmarineItemExtensions()));
 	}
 
 	protected boolean canPlace(Level level, BlockPos pos, BlockState state, UseOnContext ctx) {
