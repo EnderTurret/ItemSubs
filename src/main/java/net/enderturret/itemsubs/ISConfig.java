@@ -19,6 +19,7 @@ public class ISConfig {
 	private final BooleanValue realismMode;
 	private final IntValue distanceFromFuel;
 	private final DoubleValue speedUpgradeModifier;
+	private final BooleanValue submarineExplosions;
 
 	private ISConfig(ForgeConfigSpec.Builder builder) {
 		realismMode = builder
@@ -35,6 +36,9 @@ public class ISConfig {
 						"This value increases linearly for every speed upgrade added.",
 						"The exact formula is .5 + speedUpgradeModifier * upgradeCount.")
 				.defineInRange("speedUpgradeModifier", .25, 0, Double.MAX_VALUE);
+		submarineExplosions = builder
+				.comment("Whether submarines explode on collision at high enough speeds.")
+				.define("submarineExplosions", true);
 	}
 
 	public boolean realismMode() {
@@ -47,6 +51,10 @@ public class ISConfig {
 
 	public double speedUpgradeModifier() {
 		return speedUpgradeModifier.get();
+	}
+
+	public boolean submarineExplosions() {
+		return submarineExplosions.get();
 	}
 
 	public static ISConfig get() {
