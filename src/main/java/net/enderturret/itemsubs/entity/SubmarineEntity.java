@@ -277,6 +277,8 @@ public class SubmarineEntity extends Entity {
 		return checkBlockCollision(oldPos, nextPos, towards, nextState);
 	}
 
+	private BlockPos lastCenteredPos = null;
+
 	protected void handleMovement() {
 		setOldPosAndRot();
 
@@ -308,10 +310,13 @@ public class SubmarineEntity extends Entity {
 
 					final double xOffset = pos.x - realPos.getX();
 					final double zOffset = pos.z - realPos.getZ();
-					final boolean centered = isCentered(xOffset, zOffset);
+					final boolean centered = isCentered(xOffset, zOffset)
+							&& !realPos.equals(lastCenteredPos);
 
-					if (centered)
+					if (centered) {
+						lastCenteredPos = realPos;
 						setBurnTime(getBurnTime() - 1);
+					}
 
 					// Use a simple loop here to check at current position as well as below us.
 					for (int yOffset = 0; yOffset == 0 || yOffset == 1; yOffset++) {
@@ -537,6 +542,6 @@ public class SubmarineEntity extends Entity {
 	}
 
 	public static boolean isCentered(double xOffset, double zOffset) {
-		return xOffset > .49 && xOffset < .51 && zOffset > .49 && zOffset < .51;
+		return xOffset > .49 && xOffset < .55 && zOffset > .49 && zOffset < .55;
 	}
 }
