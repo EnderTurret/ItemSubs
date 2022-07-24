@@ -1,7 +1,7 @@
 {
   "parent": "block/cube_top",
   "textures": {
-    "top": "minecraft:block/magenta_glazed_terracotta",
-    "side": "minecraft:block/iron_block"
+    "top": "itemsubs:block/relay_top",
+    "side": "itemsubs:block/relay_side"
   }
 }
