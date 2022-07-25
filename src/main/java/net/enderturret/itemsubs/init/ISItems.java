@@ -18,7 +18,7 @@ public class ISItems {
 	public static final DeferredRegister<Item> REGISTRY = DeferredRegister.create(ForgeRegistries.ITEMS, ItemSubs.MOD_ID);
 
 	public static final RegistryObject<Item> SUBMARINE = REGISTRY.register("submarine", () -> new SubmarineItem(props(1)));
-	public static final RegistryObject<Item> SPEED_UPGRADE = REGISTRY.register("speed_upgrade", () -> new SpeedUpgradeItem(props(16)));
+	public static final RegistryObject<Item> SPEED_UPGRADE = REGISTRY.register("speed_upgrade", () -> new SpeedUpgradeItem(props(16).tab(CreativeModeTab.TAB_MISC)));
 
 	// Remember ItemBlocks?
 	public static void registerBlockItems() {
@@ -31,6 +31,6 @@ public class ISItems {
 	}
 
 	private static Item.Properties props() {
-		return new Item.Properties().tab(CreativeModeTab.TAB_MISC);
+		return new Item.Properties().tab(CreativeModeTab.TAB_TRANSPORTATION);
 	}
 }
