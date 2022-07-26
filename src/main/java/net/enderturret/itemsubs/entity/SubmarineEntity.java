@@ -616,9 +616,9 @@ public class SubmarineEntity extends Entity {
 		if (getLockedRaw() != 0) {
 			final CompoundTag lockedTag = new CompoundTag();
 			lockedTag.putBoolean("fuel", isFuelLocked());
-			lockedTag.putBoolean("upgrades", isFuelLocked());
-			lockedTag.putBoolean("inventory", isFuelLocked());
-			lockedTag.putBoolean("status", isFuelLocked());
+			lockedTag.putBoolean("upgrades", areUpgradesLocked());
+			lockedTag.putBoolean("inventory", isInventoryLocked());
+			lockedTag.putBoolean("status", isStatusLocked());
 			tag.put("locked", lockedTag);
 		}
 	}
