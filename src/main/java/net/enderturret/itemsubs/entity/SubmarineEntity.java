@@ -292,6 +292,11 @@ public class SubmarineEntity extends Entity {
 
 	private BlockPos lastCenteredPos = null;
 
+	@Override
+	protected MovementEmission getMovementEmission() {
+		return MovementEmission.EVENTS; // No sounds for now. This might change in the future.
+	}
+
 	protected void handleMovement() {
 		setOldPosAndRot();
 
