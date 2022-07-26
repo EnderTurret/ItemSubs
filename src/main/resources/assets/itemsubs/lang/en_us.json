@@ -3,6 +3,8 @@
   "entity.itemsubs.submarine": "Submarine",
 
   "item.itemsubs.speed_upgrade": "Speed Upgrade",
+  "item.itemsubs.item_sub": "Item Sub",
+
   "block.itemsubs.submarine_relay": "Submarine Relay",
   "block.itemsubs.submarine_station": "Submarine Station"
 }
