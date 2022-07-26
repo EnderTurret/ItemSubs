@@ -66,6 +66,7 @@ public class SubmarineEntity extends Entity {
 	private static final EntityDataAccessor<Integer> BURN_MAX = SynchedEntityData.defineId(SubmarineEntity.class, EntityDataSerializers.INT);
 
 	private static final EntityDataAccessor<Boolean> DECORATIVE = SynchedEntityData.defineId(SubmarineEntity.class, EntityDataSerializers.BOOLEAN);
+	private static final EntityDataAccessor<Byte> LOCKED = SynchedEntityData.defineId(SubmarineEntity.class, EntityDataSerializers.BYTE);
 
 	private static final Component NAME = Component.translatable("entity.itemsubs.submarine");
 
@@ -133,18 +134,24 @@ public class SubmarineEntity extends Entity {
 		if (result.consumesAction()) return result;
 
 		if (!player.isCrouching()) {
-			if (player instanceof ServerPlayer serverPlayer)
-				SubmarineMenu.openMenu(serverPlayer, this, hasCustomName() ? getCustomName() : NAME);
-
 			if (!player.level.isClientSide) {
+				if (player instanceof ServerPlayer serverPlayer)
+					SubmarineMenu.openMenu(serverPlayer, this, hasCustomName() ? getCustomName() : NAME);
+
 				gameEvent(GameEvent.CONTAINER_OPEN, player);
 				PiglinAi.angerNearbyPiglins(player, true);
 				return InteractionResult.CONSUME;
 			}
-		} else if (!player.level.isClientSide)
-			setMoving(!isMoving());
 
-		return InteractionResult.SUCCESS;
+			return InteractionResult.SUCCESS;
+		} else if (!isStatusLocked()) {
+			if (!player.level.isClientSide)
+				setMoving(!isMoving());
+
+			return InteractionResult.SUCCESS;
+		}
+
+		return InteractionResult.PASS;
 	}
 
 	@Override
@@ -466,6 +473,7 @@ public class SubmarineEntity extends Entity {
 		entityData.define(BURN_TIME, 0);
 		entityData.define(BURN_MAX, 0);
 		entityData.define(DECORATIVE, false);
+		entityData.define(LOCKED, (byte) 0);
 	}
 
 	public void setDamage(float damageTaken) {
@@ -580,6 +588,21 @@ public class SubmarineEntity extends Entity {
 		setBurnTime(tag.getInt("burnTime"));
 		setBurnMax(tag.getInt("burnMax"));
 		setDecorative(tag.getBoolean("decorative"));
+
+		if (tag.contains("locked", Tag.TAG_BYTE)) {
+			final boolean val = tag.getBoolean("locked");
+			setFuelLocked(val);
+			setUpgradesLocked(val);
+			setInventoryLocked(val);
+			setStatusLocked(val);
+		}
+		else if (tag.contains("locked", Tag.TAG_COMPOUND)) {
+			final CompoundTag lockedTag = tag.getCompound("locked");
+			setFuelLocked(lockedTag.getBoolean("fuel"));
+			setUpgradesLocked(lockedTag.getBoolean("upgrades"));
+			setInventoryLocked(lockedTag.getBoolean("inventory"));
+			setStatusLocked(lockedTag.getBoolean("status"));
+		}
 	}
 
 	@Override
@@ -589,6 +612,67 @@ public class SubmarineEntity extends Entity {
 		tag.putInt("burnTime", getBurnTime());
 		tag.putInt("burnMax", getBurnMax());
 		tag.putBoolean("decorative", isDecorative());
+
+		if (getLockedRaw() != 0) {
+			final CompoundTag lockedTag = new CompoundTag();
+			lockedTag.putBoolean("fuel", isFuelLocked());
+			lockedTag.putBoolean("upgrades", isFuelLocked());
+			lockedTag.putBoolean("inventory", isFuelLocked());
+			lockedTag.putBoolean("status", isFuelLocked());
+			tag.put("locked", lockedTag);
+		}
+	}
+
+	public byte getLockedRaw() {
+		return entityData.get(LOCKED);
+	}
+
+	public void setLockedRaw(byte locked) {
+		entityData.set(LOCKED, locked);
+	}
+
+	public boolean isFuelLocked() {
+		return (getLockedRaw() & 1) != 0;
+	}
+
+	public boolean areUpgradesLocked() {
+		return (getLockedRaw() & 2) != 0;
+	}
+
+	public boolean isInventoryLocked() {
+		return (getLockedRaw() & 4) != 0;
+	}
+
+	public boolean isStatusLocked() {
+		return (getLockedRaw() & 8) != 0;
+	}
+
+	public void setFuelLocked(boolean locked) {
+		if (locked)
+			setLockedRaw((byte) (getLockedRaw() | 1));
+		else
+			setLockedRaw((byte) (getLockedRaw() & ~1));
+	}
+
+	public void setUpgradesLocked(boolean locked) {
+		if (locked)
+			setLockedRaw((byte) (getLockedRaw() | 2));
+		else
+			setLockedRaw((byte) (getLockedRaw() & ~2));
+	}
+
+	public void setInventoryLocked(boolean locked) {
+		if (locked)
+			setLockedRaw((byte) (getLockedRaw() | 4));
+		else
+			setLockedRaw((byte) (getLockedRaw() & ~4));
+	}
+
+	public void setStatusLocked(boolean locked) {
+		if (locked)
+			setLockedRaw((byte) (getLockedRaw() | 8));
+		else
+			setLockedRaw((byte) (getLockedRaw() & ~8));
 	}
 
 	@Override

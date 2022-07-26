@@ -60,14 +60,22 @@ public class SubmarineMenu extends AbstractContainerMenu {
 			addSlot(new Slot(con, 0, 62, 36) { // Fuel
 				@Override
 				public boolean mayPlace(ItemStack stack) {
-					return SubmarineFuel.isValidFuel(stack);
+					return !submarine.isFuelLocked() && SubmarineFuel.isValidFuel(stack);
+				}
+				@Override
+				public boolean mayPickup(Player player) {
+					return !submarine.isFuelLocked();
 				}
 			});
 
 		addSlot(new Slot(con, 1, decor ? 80 : 98, 36) { // Upgrades
 			@Override
 			public boolean mayPlace(ItemStack stack) {
-				return stack.getItem() instanceof SpeedUpgradeItem;
+				return !submarine.areUpgradesLocked() && stack.getItem() instanceof SpeedUpgradeItem;
+			}
+			@Override
+			public boolean mayPickup(Player player) {
+				return !submarine.areUpgradesLocked();
 			}
 		});
 
@@ -75,7 +83,16 @@ public class SubmarineMenu extends AbstractContainerMenu {
 		if (!decor)
 			for (int y = 0; y < 2; ++y)
 				for (int x = 0; x < 9; ++x)
-					addSlot(new Slot(con, 2 + x + y * 9, 8 + x * 18, 72 + y * 18));
+					addSlot(new Slot(con, 2 + x + y * 9, 8 + x * 18, 72 + y * 18) {
+						@Override
+						public boolean mayPlace(ItemStack stack) {
+							return !submarine.isInventoryLocked();
+						}
+						@Override
+						public boolean mayPickup(Player player) {
+							return !submarine.isInventoryLocked();
+						}
+					});
 
 		// Player inventory slots
 		for (int y = 0; y < 3; ++y)
