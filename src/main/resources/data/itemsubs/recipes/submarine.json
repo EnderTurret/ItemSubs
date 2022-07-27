@@ -16,7 +16,7 @@
       "tag": "forge:chests/wooden"
     },
     "R": {
-      "tag": "forge:ingots/redstone"
+      "tag": "forge:storage_blocks/redstone"
     },
     "F": {
       "item": "minecraft:furnace"
