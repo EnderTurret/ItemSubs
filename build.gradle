@@ -11,7 +11,7 @@ archivesBaseName = 'ItemSubs'
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.19-41.0.110'
+    minecraft 'net.minecraftforge:forge:1.19-41.1.0'
 }
 
 minecraft {
