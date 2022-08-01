@@ -21,11 +21,19 @@ import net.minecraftforge.common.util.LazyOptional;
 
 import net.enderturret.itemsubs.entity.SubmarineEntity;
 import net.enderturret.itemsubs.init.ISBlockEntityTypes;
+import net.enderturret.itemsubs.util.DeferringCapabilityCache;
 
 public class SubmarineStationBlockEntity extends BlockEntity {
 
 	private SubmarineEntity docked;
 	private boolean queryDocked = false;
+
+	private DeferringCapabilityCache caps = new DeferringCapabilityCache(new DeferringCapabilityCache.CapabilitySupplier() {
+		@Override
+		public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
+			return docked() != null ? docked.getCapability(cap, side) : LazyOptional.empty();
+		}
+	});
 
 	public SubmarineStationBlockEntity(BlockEntityType<? extends SubmarineStationBlockEntity> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
@@ -38,7 +46,7 @@ public class SubmarineStationBlockEntity extends BlockEntity {
 	@Override
 	public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
 		if (docked() != null)
-			return docked.getCapability(cap, side);
+			return caps.getCapability(cap, side);
 
 		return super.getCapability(cap, side);
 	}
@@ -49,6 +57,7 @@ public class SubmarineStationBlockEntity extends BlockEntity {
 		docked = null;
 		queryDocked = true;
 		lastState = -1;
+		caps.invalidate();
 	}
 
 	/*
@@ -101,11 +110,11 @@ public class SubmarineStationBlockEntity extends BlockEntity {
 	}
 
 	public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
-		//System.out.println("[" + EffectiveSide.get() + "] " + lastState + ", " + docked);
 		return docked == null ? (lastState = 0) : lastState;
 	}
 
 	public void setDocked(@Nullable SubmarineEntity entity) {
+		caps.invalidate();
 		docked = entity;
 		queryDocked = false;
 		updateAnalogState();
@@ -117,6 +126,7 @@ public class SubmarineStationBlockEntity extends BlockEntity {
 			final List<SubmarineEntity> subs = serverLevel.getEntitiesOfClass(SubmarineEntity.class, new AABB(getBlockPos()));
 			docked = subs.isEmpty() ? null : subs.get(0);
 			queryDocked = false;
+			caps.invalidate();
 			updateAnalogState();
 		}
 
