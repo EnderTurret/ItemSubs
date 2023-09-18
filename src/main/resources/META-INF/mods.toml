@@ -12,6 +12,7 @@ issueTrackerURL="https://github.com/EnderTurret/ItemSubs/issues"
     version="${file.jarVersion}"
     authors="EnderTurret, Dustskys"
     displayURL="https://github.com/EnderTurret/ItemSubs"
+    logoFile="icon.png"
 
 [[dependencies.itemsubs]]
     modId="forge"
