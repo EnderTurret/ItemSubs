@@ -1,44 +1,33 @@
 package net.enderturret.itemsubs.util;
 
+import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.world.Container;
+import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.item.ItemStack;
 
+/**
+ * {@link Container} versions of {@link ContainerHelper} save/load methods.
+ * @author EnderTurret
+ */
 public class ContainerHelper2 {
 
 	public static CompoundTag saveAllItems(CompoundTag tag, Container container, boolean saveEmpty) {
-		final ListTag items = new ListTag();
+		final NonNullList<ItemStack> list = NonNullList.withSize(container.getContainerSize(), ItemStack.EMPTY);
 
-		for (int slot = 0; slot < container.getContainerSize(); slot++) {
-			final ItemStack stack = container.getItem(slot);
+		for (int slot = 0; slot < container.getContainerSize(); slot++)
+			list.set(slot, container.getItem(slot));
 
-			if (!stack.isEmpty()) {
-				final CompoundTag itemTag = new CompoundTag();
-
-				itemTag.putByte("Slot", (byte) slot);
-				stack.save(itemTag);
-
-				items.add(itemTag);
-			}
-		}
-
-		if (!items.isEmpty() || saveEmpty)
-			tag.put("Items", items);
+		ContainerHelper.saveAllItems(tag, list, saveEmpty);
 
 		return tag;
 	}
 
 	public static void loadAllItems(CompoundTag tag, Container container) {
-		final ListTag items = tag.getList("Items", Tag.TAG_COMPOUND);
+		final NonNullList<ItemStack> list = NonNullList.withSize(container.getContainerSize(), ItemStack.EMPTY);
+		ContainerHelper.loadAllItems(tag, list);
 
-		for (int i = 0; i < items.size(); i++) {
-			final CompoundTag itemTag = items.getCompound(i);
-			final int slot = itemTag.getByte("Slot") & 255;
-
-			if (slot >= 0 && slot < container.getContainerSize())
-				container.setItem(slot, ItemStack.of(itemTag));
-		}
+		for (int slot = 0; slot < list.size(); slot++)
+			container.setItem(slot, list.get(slot));
 	}
 }
