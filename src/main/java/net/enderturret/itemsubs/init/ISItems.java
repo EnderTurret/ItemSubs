@@ -2,7 +2,6 @@ package net.enderturret.itemsubs.init;
 
 import org.jetbrains.annotations.ApiStatus.Internal;
 
-import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -23,8 +22,6 @@ public final class ISItems {
 
 	public static final RegistryObject<Item> SUBMARINE = REGISTRY.register("submarine", () -> new SubmarineItem(props(1)));
 	public static final RegistryObject<Item> SPEED_UPGRADE = REGISTRY.register("speed_upgrade", () -> new SpeedUpgradeItem(props(16).tab(CreativeModeTab.TAB_MISC)));
-	public static final RegistryObject<Item> ITEM_SUB = REGISTRY.register("item_sub", () -> new Item(props().tab(CreativeModeTab.TAB_FOOD)
-			.food(new FoodProperties.Builder().nutrition(8).saturationMod(0.8F).build())));
 
 	// Remember ItemBlocks?
 	@Internal
