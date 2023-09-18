@@ -3,7 +3,7 @@ package net.enderturret.itemsubs.entity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 
-public interface CollisionResult {
+public sealed interface CollisionResult {
 
 	public boolean wouldCollide();
 
