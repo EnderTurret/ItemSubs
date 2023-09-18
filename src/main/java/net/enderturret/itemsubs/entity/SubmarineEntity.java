@@ -42,7 +42,9 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.InvWrapper;
+import net.minecraftforge.items.wrapper.RangedWrapper;
 
 import net.enderturret.itemsubs.ISConfig;
 import net.enderturret.itemsubs.SubmarineFuel;
@@ -52,7 +54,6 @@ import net.enderturret.itemsubs.init.ISItems;
 import net.enderturret.itemsubs.item.SpeedUpgradeItem;
 import net.enderturret.itemsubs.menu.SubmarineMenu;
 import net.enderturret.itemsubs.util.ContainerHelper2;
-import net.enderturret.itemsubs.util.SlotLimitingContainer;
 
 public class SubmarineEntity extends Entity {
 
@@ -85,13 +86,10 @@ public class SubmarineEntity extends Entity {
 		}
 	};
 
-	private final SlotLimitingContainer fuel = new SlotLimitingContainer(container, 0, 1);
-	private final SlotLimitingContainer storage = new SlotLimitingContainer(container, 2, container.getContainerSize() - 2);
+	private LazyOptional<IItemHandlerModifiable> containerCap;
 
-	private LazyOptional<?> containerCap = LazyOptional.of(() -> new InvWrapper(container));
-
-	private LazyOptional<?> fuelCap = LazyOptional.of(() -> new InvWrapper(fuel));
-	private LazyOptional<?> storageOnlyCap = LazyOptional.of(() -> new InvWrapper(storage));
+	private LazyOptional<IItemHandlerModifiable> fuelCap;
+	private LazyOptional<IItemHandlerModifiable> storageOnlyCap;
 
 	public SubmarineEntity(EntityType<? extends SubmarineEntity> type, Level level) {
 		super(type, level);
@@ -103,10 +101,17 @@ public class SubmarineEntity extends Entity {
 			if (state.getBlock() instanceof ISubmarineBlock block)
 				block.onSubmarineInventoryChanged(state, this.level, blockPosition(), this);
 		});
+		makeCaps();
 	}
 
 	public SubmarineEntity(Level level) {
 		this(ISEntityTypes.SUBMARINE.get(), level);
+	}
+
+	protected void makeCaps() {
+		containerCap = LazyOptional.of(() -> new InvWrapper(container));
+		fuelCap = LazyOptional.of(() -> new RangedWrapper(containerCap.orElseThrow(IllegalStateException::new), 0, 1));
+		storageOnlyCap = LazyOptional.of(() -> new RangedWrapper(containerCap.orElseThrow(IllegalStateException::new), 2, container.getContainerSize()));
 	}
 
 	public SimpleContainer getContainer() {
@@ -557,9 +562,7 @@ public class SubmarineEntity extends Entity {
 	@Override
 	public void reviveCaps() {
 		super.reviveCaps();
-		containerCap = LazyOptional.of(() -> new InvWrapper(container));
-		fuelCap = LazyOptional.of(() -> new InvWrapper(fuel));
-		storageOnlyCap = LazyOptional.of(() -> new InvWrapper(storage));
+		makeCaps();
 	}
 
 	public void readItemData(ItemStack stack) {
