@@ -19,6 +19,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkHooks;
 
 import net.enderturret.itemsubs.SubmarineFuel;
+import net.enderturret.itemsubs.entity.LockedState;
 import net.enderturret.itemsubs.entity.SubmarineEntity;
 import net.enderturret.itemsubs.init.ISMenus;
 import net.enderturret.itemsubs.item.SpeedUpgradeItem;
@@ -63,22 +64,22 @@ public final class SubmarineMenu extends AbstractContainerMenu {
 			addSlot(new Slot(con, 0, 62, 36) { // Fuel
 				@Override
 				public boolean mayPlace(ItemStack stack) {
-					return !submarine.isFuelLocked() && SubmarineFuel.isValidFuel(stack);
+					return !submarine.isLocked(LockedState.FUEL) && SubmarineFuel.isValidFuel(stack);
 				}
 				@Override
 				public boolean mayPickup(Player player) {
-					return !submarine.isFuelLocked();
+					return !submarine.isLocked(LockedState.FUEL);
 				}
 			});
 
 		addSlot(new Slot(con, 1, decor ? 80 : 98, 36) { // Upgrades
 			@Override
 			public boolean mayPlace(ItemStack stack) {
-				return !submarine.areUpgradesLocked() && stack.getItem() instanceof SpeedUpgradeItem;
+				return !submarine.isLocked(LockedState.UPGRADES) && stack.getItem() instanceof SpeedUpgradeItem;
 			}
 			@Override
 			public boolean mayPickup(Player player) {
-				return !submarine.areUpgradesLocked();
+				return !submarine.isLocked(LockedState.UPGRADES);
 			}
 		});
 
@@ -89,11 +90,11 @@ public final class SubmarineMenu extends AbstractContainerMenu {
 					addSlot(new Slot(con, 2 + x + y * 9, 8 + x * 18, 72 + y * 18) {
 						@Override
 						public boolean mayPlace(ItemStack stack) {
-							return !submarine.isInventoryLocked();
+							return !submarine.isLocked(LockedState.INVENTORY);
 						}
 						@Override
 						public boolean mayPickup(Player player) {
-							return !submarine.isInventoryLocked();
+							return !submarine.isLocked(LockedState.INVENTORY);
 						}
 					});
 

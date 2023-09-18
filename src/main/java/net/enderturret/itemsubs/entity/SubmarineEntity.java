@@ -149,7 +149,7 @@ public final class SubmarineEntity extends Entity {
 			}
 
 			return InteractionResult.SUCCESS;
-		} else if (!isStatusLocked()) {
+		} else if (!isLocked(LockedState.STATUS)) {
 			if (!player.level.isClientSide)
 				setMoving(!isMoving());
 
@@ -594,17 +594,15 @@ public final class SubmarineEntity extends Entity {
 
 		if (tag.contains("locked", Tag.TAG_BYTE)) {
 			final boolean val = tag.getBoolean("locked");
-			setFuelLocked(val);
-			setUpgradesLocked(val);
-			setInventoryLocked(val);
-			setStatusLocked(val);
+			for (LockedState state : LockedState.values())
+				setLocked(state, val);
 		}
 		else if (tag.contains("locked", Tag.TAG_COMPOUND)) {
 			final CompoundTag lockedTag = tag.getCompound("locked");
-			setFuelLocked(lockedTag.getBoolean("fuel"));
-			setUpgradesLocked(lockedTag.getBoolean("upgrades"));
-			setInventoryLocked(lockedTag.getBoolean("inventory"));
-			setStatusLocked(lockedTag.getBoolean("status"));
+			setLocked(LockedState.FUEL, lockedTag.getBoolean("fuel"));
+			setLocked(LockedState.UPGRADES, lockedTag.getBoolean("upgrades"));
+			setLocked(LockedState.INVENTORY, lockedTag.getBoolean("inventory"));
+			setLocked(LockedState.STATUS, lockedTag.getBoolean("status"));
 		}
 	}
 
@@ -618,64 +616,28 @@ public final class SubmarineEntity extends Entity {
 
 		if (getLockedRaw() != 0) {
 			final CompoundTag lockedTag = new CompoundTag();
-			lockedTag.putBoolean("fuel", isFuelLocked());
-			lockedTag.putBoolean("upgrades", areUpgradesLocked());
-			lockedTag.putBoolean("inventory", isInventoryLocked());
-			lockedTag.putBoolean("status", isStatusLocked());
+			lockedTag.putBoolean("fuel", isLocked(LockedState.FUEL));
+			lockedTag.putBoolean("upgrades", isLocked(LockedState.UPGRADES));
+			lockedTag.putBoolean("inventory", isLocked(LockedState.INVENTORY));
+			lockedTag.putBoolean("status", isLocked(LockedState.STATUS));
 			tag.put("locked", lockedTag);
 		}
 	}
 
-	public byte getLockedRaw() {
+	protected byte getLockedRaw() {
 		return entityData.get(LOCKED);
 	}
 
-	public void setLockedRaw(byte locked) {
+	protected void setLockedRaw(byte locked) {
 		entityData.set(LOCKED, locked);
 	}
 
-	public boolean isFuelLocked() {
-		return (getLockedRaw() & 1) != 0;
+	public boolean isLocked(LockedState state) {
+		return state.get(getLockedRaw());
 	}
 
-	public boolean areUpgradesLocked() {
-		return (getLockedRaw() & 2) != 0;
-	}
-
-	public boolean isInventoryLocked() {
-		return (getLockedRaw() & 4) != 0;
-	}
-
-	public boolean isStatusLocked() {
-		return (getLockedRaw() & 8) != 0;
-	}
-
-	public void setFuelLocked(boolean locked) {
-		if (locked)
-			setLockedRaw((byte) (getLockedRaw() | 1));
-		else
-			setLockedRaw((byte) (getLockedRaw() & ~1));
-	}
-
-	public void setUpgradesLocked(boolean locked) {
-		if (locked)
-			setLockedRaw((byte) (getLockedRaw() | 2));
-		else
-			setLockedRaw((byte) (getLockedRaw() & ~2));
-	}
-
-	public void setInventoryLocked(boolean locked) {
-		if (locked)
-			setLockedRaw((byte) (getLockedRaw() | 4));
-		else
-			setLockedRaw((byte) (getLockedRaw() & ~4));
-	}
-
-	public void setStatusLocked(boolean locked) {
-		if (locked)
-			setLockedRaw((byte) (getLockedRaw() | 8));
-		else
-			setLockedRaw((byte) (getLockedRaw() & ~8));
+	public void setLocked(LockedState state, boolean locked) {
+		setLockedRaw(state.set(getLockedRaw(), locked));
 	}
 
 	@Override
