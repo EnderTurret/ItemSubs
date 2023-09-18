@@ -25,17 +25,20 @@ public class ISConfig {
 		realismMode = builder
 				.comment("Whether \"realism mode\" is enabled.",
 						"This currently affects whether you can place submarines in the air.",
-						"This feature, while fun, isn't realistic and may be undesirable in most modded environments.")
+						"This feature -- while fun -- isn't necessarily realistic and likely undesirable in many modded environments.")
 				.define("realismMode", true);
+
 		distanceFromFuel = builder
 				.comment("The number of blocks a submarine will travel per item smeltable from fuel.",
-						"For example, a piece of coal smelts 8 items, so a submarine can move 40 (8 * 5) blocks with one (assuming a distanceFromFuel value of 5.)")
-				.defineInRange("distanceFromFuel", 5, 1, Integer.MAX_VALUE);
+						"For example, a piece of coal smelts 8 items, so a submarine can move 24 (8 * 3) blocks with one (assuming a distanceFromFuel value of 3.)")
+				.defineInRange("distanceFromFuel", 3, 1, Integer.MAX_VALUE);
+
 		speedUpgradeModifier = builder
 				.comment("The modifier effect a single speed upgrade has on a submarine.",
 						"This value increases linearly for every speed upgrade added.",
 						"The exact formula is .5 + speedUpgradeModifier * upgradeCount.")
 				.defineInRange("speedUpgradeModifier", .25, 0, Double.MAX_VALUE);
+
 		submarineExplosions = builder
 				.comment("Whether submarines explode on collision at high enough speeds.")
 				.define("submarineExplosions", true);
