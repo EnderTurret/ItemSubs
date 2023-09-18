@@ -1,12 +1,14 @@
 plugins {
     id 'eclipse'
-    id 'net.minecraftforge.gradle' version '5.+'
+    id 'net.minecraftforge.gradle' version '[6.0, 6.2)'
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
 }
 
 version = '1.19.2-1.0.0'
 group = 'net.enderturret'
-archivesBaseName = 'ItemSubs'
+base {
+    archivesName = 'ItemSubs'
+}
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
@@ -18,9 +20,7 @@ minecraft {
     mappings channel: 'parchment', version: '2022.11.27-1.19.2'
 
     runs {
-        client {
-            workingDirectory project.file('run')
-
+        configureEach {
             mods {
                 itemsubs {
                     source sourceSets.main
@@ -28,19 +28,17 @@ minecraft {
             }
         }
 
-        server {
+        client {
             workingDirectory project.file('run')
+        }
 
-            mods {
-                itemsubs {
-                    source sourceSets.main
-                }
-            }
+        server {
+            workingDirectory project.file('run/server')
         }
     }
 }
 
-jar {
+tasks.named('jar', Jar).configure {
     manifest {
         attributes([
             'Specification-Title': 'Item Subs',
@@ -54,16 +52,18 @@ jar {
     }
 }
 
+tasks.withType(GenerateModuleMetadata).configureEach {
+    enabled = false
+}
+
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }
 
-import groovy.json.*
-
-processResources {
+tasks.named('processResources', ProcessResources).configure {
     doLast {
         fileTree(dir: outputs.files.asPath, include: '**/*.json').each {
-            File file -> file.text = JsonOutput.toJson(new JsonSlurper().parse(file))
+            File file -> file.text = groovy.json.JsonOutput.toJson(new groovy.json.JsonSlurper().parse(file))
         }
     }
 }
