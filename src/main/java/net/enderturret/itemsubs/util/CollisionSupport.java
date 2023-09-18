@@ -1,4 +1,4 @@
-package net.enderturret.itemsubs.block;
+package net.enderturret.itemsubs.util;
 
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.shapes.BooleanOp;

@@ -19,6 +19,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import net.enderturret.itemsubs.block.entity.SubmarineStationBlockEntity;
 import net.enderturret.itemsubs.entity.SubmarineEntity;
+import net.enderturret.itemsubs.util.CollisionSupport;
 
 public class SubmarineStationBlock extends WaterloggedHorizontalBlock implements ISubmarineBlock, EntityBlock {
 
