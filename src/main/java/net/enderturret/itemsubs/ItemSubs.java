@@ -1,5 +1,7 @@
 package net.enderturret.itemsubs;
 
+import org.jetbrains.annotations.ApiStatus.Internal;
+
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -13,7 +15,8 @@ import net.enderturret.itemsubs.init.ISItems;
 import net.enderturret.itemsubs.init.ISMenus;
 
 @Mod(ItemSubs.MOD_ID)
-public class ItemSubs {
+@Internal
+public final class ItemSubs {
 
 	public static final String MOD_ID = "itemsubs";
 

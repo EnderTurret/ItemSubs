@@ -1,5 +1,7 @@
 package net.enderturret.itemsubs.client.gui;
 
+import org.jetbrains.annotations.ApiStatus.Internal;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -12,7 +14,8 @@ import net.enderturret.itemsubs.ItemSubs;
 import net.enderturret.itemsubs.entity.SubmarineEntity;
 import net.enderturret.itemsubs.menu.SubmarineMenu;
 
-public class SubmarineGui extends AbstractContainerScreen<SubmarineMenu> {
+@Internal
+public final class SubmarineGui extends AbstractContainerScreen<SubmarineMenu> {
 
 	private static final ResourceLocation TEXTURE = new ResourceLocation(ItemSubs.MOD_ID, "textures/gui/submarine.png");
 	private static final ResourceLocation DECOR_TEXTURE = new ResourceLocation(ItemSubs.MOD_ID, "textures/gui/decorative_submarine.png");

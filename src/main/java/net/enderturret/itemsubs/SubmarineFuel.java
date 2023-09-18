@@ -4,7 +4,7 @@ import net.minecraft.world.item.ItemStack;
 
 import net.minecraftforge.common.ForgeHooks;
 
-public class SubmarineFuel {
+public final class SubmarineFuel {
 
 	public static boolean isValidFuel(ItemStack fuel) {
 		return getBurnTime(fuel) > 0;

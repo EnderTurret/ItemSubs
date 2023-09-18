@@ -1,5 +1,7 @@
 package net.enderturret.itemsubs.client.entity;
 
+import org.jetbrains.annotations.ApiStatus.Internal;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
@@ -16,7 +18,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.enderturret.itemsubs.ItemSubs;
 import net.enderturret.itemsubs.entity.SubmarineEntity;
 
-public class SubmarineModel extends EntityModel<SubmarineEntity> {
+@Internal
+public final class SubmarineModel extends EntityModel<SubmarineEntity> {
 
 	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(ItemSubs.MOD_ID, "submarine"), "main");
 

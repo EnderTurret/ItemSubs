@@ -1,11 +1,14 @@
 package net.enderturret.itemsubs;
 
+import org.jetbrains.annotations.ApiStatus.Internal;
+
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
 import net.minecraftforge.common.ForgeConfigSpec.DoubleValue;
 import net.minecraftforge.common.ForgeConfigSpec.IntValue;
 
-public class ISConfig {
+@Internal
+public final class ISConfig {
 
 	static final ForgeConfigSpec SERVER_SPEC;
 	private static final ISConfig INSTANCE;

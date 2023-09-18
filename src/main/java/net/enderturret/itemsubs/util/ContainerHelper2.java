@@ -10,7 +10,7 @@ import net.minecraft.world.item.ItemStack;
  * {@link Container} versions of {@link ContainerHelper} save/load methods.
  * @author EnderTurret
  */
-public class ContainerHelper2 {
+public final class ContainerHelper2 {
 
 	public static CompoundTag saveAllItems(CompoundTag tag, Container container, boolean saveEmpty) {
 		final NonNullList<ItemStack> list = NonNullList.withSize(container.getContainerSize(), ItemStack.EMPTY);

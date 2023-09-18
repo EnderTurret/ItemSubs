@@ -55,7 +55,7 @@ import net.enderturret.itemsubs.item.SpeedUpgradeItem;
 import net.enderturret.itemsubs.menu.SubmarineMenu;
 import net.enderturret.itemsubs.util.ContainerHelper2;
 
-public class SubmarineEntity extends Entity {
+public final class SubmarineEntity extends Entity {
 
 	private static final EntityDataAccessor<Integer> HURT = SynchedEntityData.defineId(SubmarineEntity.class, EntityDataSerializers.INT);
 	private static final EntityDataAccessor<Integer> HURTDIR = SynchedEntityData.defineId(SubmarineEntity.class, EntityDataSerializers.INT);

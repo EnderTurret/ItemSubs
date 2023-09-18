@@ -1,5 +1,7 @@
 package net.enderturret.itemsubs.client.entity;
 
+import org.jetbrains.annotations.ApiStatus.Internal;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Vector3f;
@@ -15,7 +17,8 @@ import net.minecraft.util.Mth;
 import net.enderturret.itemsubs.ItemSubs;
 import net.enderturret.itemsubs.entity.SubmarineEntity;
 
-public class SubmarineRenderer extends EntityRenderer<SubmarineEntity> {
+@Internal
+public final class SubmarineRenderer extends EntityRenderer<SubmarineEntity> {
 
 	private static final ResourceLocation TEXTURE = new ResourceLocation(ItemSubs.MOD_ID, "textures/entity/submarine.png");
 

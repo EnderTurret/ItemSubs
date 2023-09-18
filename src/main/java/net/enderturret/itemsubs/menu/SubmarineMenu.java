@@ -1,5 +1,7 @@
 package net.enderturret.itemsubs.menu;
 
+import org.jetbrains.annotations.ApiStatus.Internal;
+
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -21,7 +23,8 @@ import net.enderturret.itemsubs.entity.SubmarineEntity;
 import net.enderturret.itemsubs.init.ISMenus;
 import net.enderturret.itemsubs.item.SpeedUpgradeItem;
 
-public class SubmarineMenu extends AbstractContainerMenu {
+@Internal
+public final class SubmarineMenu extends AbstractContainerMenu {
 
 	public final SubmarineEntity submarine;
 	public final SimpleContainer con;

@@ -11,7 +11,7 @@ import net.minecraft.core.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 
-public class DeferringCapabilityCache {
+public final class DeferringCapabilityCache {
 
 	private final Map<Key, LazyOptional<?>> cache = new HashMap<>();
 	private final CapabilitySupplier sup;

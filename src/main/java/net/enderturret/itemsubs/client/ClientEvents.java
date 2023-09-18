@@ -1,6 +1,7 @@
 package net.enderturret.itemsubs.client;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.ApiStatus.Internal;
 
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.model.HumanoidModel;
@@ -24,10 +25,11 @@ import net.enderturret.itemsubs.client.gui.SubmarineGui;
 import net.enderturret.itemsubs.init.ISEntityTypes;
 import net.enderturret.itemsubs.init.ISMenus;
 
-public class ClientEvents {
+@Internal
+public final class ClientEvents {
 
 	@EventBusSubscriber(modid = ItemSubs.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-	static class Mod {
+	static final class Mod {
 
 		@SubscribeEvent
 		static void registerLayers(RegisterLayerDefinitions e) {

@@ -1,5 +1,7 @@
 package net.enderturret.itemsubs.init;
 
+import org.jetbrains.annotations.ApiStatus.Internal;
+
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -14,8 +16,9 @@ import net.enderturret.itemsubs.ItemSubs;
 import net.enderturret.itemsubs.item.SpeedUpgradeItem;
 import net.enderturret.itemsubs.item.SubmarineItem;
 
-public class ISItems {
+public final class ISItems {
 
+	@Internal
 	public static final DeferredRegister<Item> REGISTRY = DeferredRegister.create(ForgeRegistries.ITEMS, ItemSubs.MOD_ID);
 
 	public static final RegistryObject<Item> SUBMARINE = REGISTRY.register("submarine", () -> new SubmarineItem(props(1)));
@@ -24,6 +27,7 @@ public class ISItems {
 			.food(new FoodProperties.Builder().nutrition(8).saturationMod(0.8F).build())));
 
 	// Remember ItemBlocks?
+	@Internal
 	public static void registerBlockItems() {
 		for (RegistryObject<Block> obj : ISBlocks.REGISTRY.getEntries())
 			REGISTRY.register(obj.getId().getPath(), () -> new BlockItem(obj.get(), props()));

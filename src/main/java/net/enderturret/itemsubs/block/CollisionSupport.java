@@ -5,7 +5,7 @@ import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class CollisionSupport {
+public final class CollisionSupport {
 
 	public static VoxelShape of(VoxelShape... shapes) {
 		VoxelShape result = Shapes.empty();

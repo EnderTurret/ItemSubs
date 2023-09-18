@@ -1,5 +1,7 @@
 package net.enderturret.itemsubs.init;
 
+import org.jetbrains.annotations.ApiStatus.Internal;
+
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Material;
 
@@ -11,8 +13,9 @@ import net.enderturret.itemsubs.ItemSubs;
 import net.enderturret.itemsubs.block.SubmarineRelayBlock;
 import net.enderturret.itemsubs.block.SubmarineStationBlock;
 
-public class ISBlocks {
+public final class ISBlocks {
 
+	@Internal
 	public static final DeferredRegister<Block> REGISTRY = DeferredRegister.create(ForgeRegistries.BLOCKS, ItemSubs.MOD_ID);
 
 	public static final RegistryObject<Block> SUBMARINE_RELAY = REGISTRY.register("submarine_relay", () -> new SubmarineRelayBlock(props(Material.METAL).strength(1.5F, 6F).requiresCorrectToolForDrops()));

@@ -3,6 +3,7 @@ package net.enderturret.itemsubs.item;
 import java.util.function.Consumer;
 
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.ApiStatus.Internal;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -28,7 +29,8 @@ import net.enderturret.itemsubs.client.ClientEvents;
 import net.enderturret.itemsubs.entity.SubmarineEntity;
 import net.enderturret.itemsubs.init.ISEntityTypes;
 
-public class SubmarineItem extends Item {
+@Internal
+public final class SubmarineItem extends Item {
 
 	public SubmarineItem(Item.Properties props) {
 		super(props);
